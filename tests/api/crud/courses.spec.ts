@@ -1,0 +1,121 @@
+import { loginAndGetUser } from '@_src/helper/auth';
+import { CourseRatingModel } from '@_src/models/course.model';
+import { testUser1 } from '@_src/test-data/user.data';
+import { apiUrls } from '@_src/utils/api.util';
+import { HTTP_STATUS } from '@_src/utils/http-status';
+import { expect, test } from '@playwright/test';
+
+test.describe('Courses API', () => {
+  let courseId = 1;
+
+  test('should displayed all courses @logged', async ({ request }) => {
+    const response = await request.get(apiUrls.coursesUrl);
+    const responseJson = await response.json();
+
+    const firstCourse = responseJson[0];
+
+    expect(response.status()).toBe(HTTP_STATUS.OK);
+    expect(Array.isArray(responseJson)).toBe(true);
+    expect(responseJson.length).toBeGreaterThan(0);
+    expect(firstCourse.id).toBeTruthy();
+    expect(['Beginner', 'Intermediate', 'Advanced']).toContain(
+      firstCourse.level,
+    );
+  });
+
+  test('should return course details by ID', async ({ request }) => {
+    const courseId = 4;
+    const response = await request.get(apiUrls.courseByIdUrl(courseId));
+    const responseJson = await response.json();
+
+    expect(response.status()).toBe(HTTP_STATUS.OK);
+    expect(responseJson).toMatchObject({
+      id: 4,
+      title: 'Playwright Automation Testing',
+      description:
+        'Learn end-to-end testing with Playwright. Automate browser interactions, test web applications, and write reliable tests.',
+      thumbnail: '..\\data\\learning\\courses\\playwright.jpg',
+      instructor: 'John Doe',
+      instructorId: 2,
+      level: 'Intermediate',
+      tags: ['Playwright', 'Testing', 'Automation'],
+      prerequisites: ['JavaScript', 'Testing Basics'],
+      price: 129.99,
+      learningObjectives: [
+        'Master Playwright automation testing',
+        'Automate browser interactions',
+        'Write reliable end-to-end tests',
+        'Test web applications effectively',
+        'Debug and optimize test scripts',
+        'Implement testing best practices',
+      ],
+      totalHours: 2.2,
+      duration: '2.2 hour(s)',
+    });
+    expect(typeof responseJson.students).toBe('number');
+    expect(typeof responseJson.rating).toBe('number');
+  });
+
+  test('should not displayed course with ID 9999', async ({ request }) => {
+    const courseId = 9999;
+    const response = await request.get(apiUrls.courseByIdUrl(courseId));
+    const responseBody = await response.text();
+    const responseJson = JSON.parse(responseBody);
+
+    expect(response.status()).toBe(HTTP_STATUS.NOT_FOUND);
+    expect(responseJson.error.message).toBe('Course not found');
+  });
+
+  test('should displayed course ratings @logged', async ({ request }) => {
+    const courseId = 2;
+    const response = await request.get(apiUrls.courseRatingsUrl(courseId));
+    const responseJson = await response.json();
+
+    expect(response.status()).toBe(HTTP_STATUS.OK);
+    expect(Array.isArray(responseJson)).toBe(true);
+    expect(responseJson.length).toBeGreaterThan(0);
+
+    responseJson.forEach((rating: CourseRatingModel) => {
+      expect(rating.rating).toBeGreaterThan(0);
+      expect(typeof rating.comment).toBe('string');
+      expect(rating.createdAt).toBeTruthy();
+      expect(rating.userInfo).toHaveProperty('name');
+    });
+  });
+
+  test('should display progress for user @logged', async ({ request }) => {
+    const { authHeader } = await loginAndGetUser(request);
+    const progressResponse = await request.get(
+      apiUrls.courseProgressUrl(courseId),
+      { headers: { Authorization: authHeader } },
+    );
+
+    expect(progressResponse.status()).toBe(HTTP_STATUS.OK);
+    const progress = await progressResponse.json();
+    expect(typeof progress.progress).toBe('number');
+  });
+
+  test('should not display progress for not authorized user @logged', async ({
+    request,
+  }) => {
+    const response = await request.post(apiUrls.loginUrl, { data: testUser1 });
+
+    const progressResponse = await request.get(
+      apiUrls.courseProgressUrl(courseId),
+    );
+    expect(response).toBeDefined();
+    expect(progressResponse.status()).toBe(HTTP_STATUS.FORBIDDEN);
+  });
+
+  test('should not display rate when user is not at this course @logged', async ({
+    request,
+  }) => {
+    const { authHeader } = await loginAndGetUser(request);
+    const rateResponse = await request.post(apiUrls.courseRateUrl(courseId), {
+      data: { rating: 4, comment: 'test' },
+      headers: { Authorization: authHeader },
+    });
+
+    expect(rateResponse.status()).toBe(HTTP_STATUS.FORBIDDEN);
+  });
+});

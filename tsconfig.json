@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "strict": true,
+    "module": "CommonJS",
+    "sourceMap": true,
+    "ignoreDeprecations": "6.0",
+    "baseUrl": ".",
+    "paths": {
+      "@_config/*": ["config/*"],
+      "@_pw-config": ["playwright.config"],
+      "@_src/*": ["src/*"]
+    }
+  }
+}
