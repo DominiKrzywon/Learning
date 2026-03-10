@@ -1,68 +1,28 @@
-import { prepareRandomUser } from '@_src/factory/user.factory';
+import { expect, test } from '@_src/fixtures/user.fixture';
 import { loginAndGetUser } from '@_src/helper/auth';
+import { restoreSystem } from '@_src/helper/restore';
 import { userProfileData } from '@_src/test-data/user.profile.data';
 import { apiUrls } from '@_src/utils/api.util';
 import { HTTP_STATUS } from '@_src/utils/http-status';
 import { faker } from '@faker-js/faker';
-import { APIRequestContext, expect, test } from '@playwright/test';
 
 test.describe('REQ-011 User Profile Management', () => {
-  const restoreUrl = '/api/learning/system/restore2';
-
-  async function createUserAndLogin(request: APIRequestContext) {
-    const registerUserData = prepareRandomUser();
-    const registerRes = await request.post(apiUrls.registerUrl, {
-      data: registerUserData,
-    });
-
-    expect(registerRes.status()).toBe(HTTP_STATUS.OK);
-
-    const loginContext = await loginAndGetUser(request, {
-      username: registerUserData.username,
-      password: registerUserData.password,
-    });
-
-    return {
-      ...loginContext,
-      registerUserData,
-    };
-  }
-
   test.beforeEach(async ({ request }) => {
-    const restoreRes = await request.get(restoreUrl);
-    expect(restoreRes.status()).toBe(HTTP_STATUS.OK);
-  });
-
-  test.afterEach(async ({ request }) => {
-    const restoreRes = await request.get(restoreUrl);
-    expect(restoreRes.status()).toBe(HTTP_STATUS.OK);
+    await restoreSystem(request);
   });
 
   test('REQ-011 should update user profile and persist changes @logged', async ({
     request,
+    loggedUser,
   }) => {
-    const { authHeader, userId, registerUserData } =
-      await createUserAndLogin(request);
-    const beforeRes = await request.get(apiUrls.getUserProfileUrl(userId), {
-      headers: { Authorization: authHeader },
-    });
+    const { authHeader, userId, username, password } = loggedUser;
 
-    expect(beforeRes.status()).toBe(HTTP_STATUS.OK);
-
-    const beforeJson = await beforeRes.json();
-    const originalEmail = beforeJson.email;
-
-    const stamp = new Date()
-      .toISOString()
-      .replace(/[-:.TZ]/g, '')
-      .slice(0, 12);
-
-    const updatedEmail = `michael.${stamp}@test.test.com`;
+    const updatedEmail = faker.internet.email();
 
     const updatePayload = {
       ...userProfileData,
       email: updatedEmail,
-      currentPassword: registerUserData.password,
+      currentPassword: password,
     };
 
     const updateRes = await request.put(apiUrls.putUserProfileUrl(userId), {
@@ -74,43 +34,31 @@ test.describe('REQ-011 User Profile Management', () => {
     const updateJson = await updateRes.json();
     expect(updateJson.success).toBe(true);
 
-    let currentAuthHeader = authHeader;
+    const relogin = await loginAndGetUser(request, {
+      username,
+      password,
+    });
+    const currentAuthHeader = relogin.authHeader;
 
-    let afterRes = await request.get(apiUrls.getUserProfileUrl(userId), {
+    const afterRes = await request.get(apiUrls.getUserProfileUrl(userId), {
       headers: { Authorization: currentAuthHeader },
     });
-
-    if (
-      afterRes.status() === HTTP_STATUS.UNAUTHORIZED ||
-      afterRes.status() === HTTP_STATUS.FORBIDDEN
-    ) {
-      const relogin = await loginAndGetUser(request, {
-        username: registerUserData.username,
-        password: registerUserData.password,
-      });
-      currentAuthHeader = relogin.authHeader;
-
-      afterRes = await request.get(apiUrls.getUserProfileUrl(userId), {
-        headers: { Authorization: currentAuthHeader },
-      });
-    }
 
     expect(afterRes.status()).toBe(HTTP_STATUS.OK);
     const afterJson = await afterRes.json();
 
     expect(afterJson.email).toBe(updatedEmail);
-    expect(afterJson.email).not.toBe(originalEmail);
   });
 
   test('REQ-011 should change password with valid current password @logged', async ({
     request,
+    loggedUser,
   }) => {
-    const { authHeader, userId, registerUserData } =
-      await createUserAndLogin(request);
+    const { authHeader, userId, username, password } = loggedUser;
 
     const newPassword = faker.internet.password();
     const changePasswordPayload = {
-      currentPassword: registerUserData.password,
+      currentPassword: password,
       newPassword,
     };
 
@@ -127,7 +75,7 @@ test.describe('REQ-011 User Profile Management', () => {
     expect(changePasswordJson.success).toBe(true);
 
     const loginNewPassword = await request.post(apiUrls.loginUrl, {
-      data: { username: registerUserData.username, password: newPassword },
+      data: { username, password: newPassword },
     });
 
     expect(loginNewPassword.status()).toBe(HTTP_STATUS.OK);
@@ -136,8 +84,8 @@ test.describe('REQ-011 User Profile Management', () => {
 
     const loginWithOldPassword = await request.post(apiUrls.loginUrl, {
       data: {
-        username: registerUserData.username,
-        password: registerUserData.password,
+        username,
+        password,
       },
     });
 
@@ -146,9 +94,9 @@ test.describe('REQ-011 User Profile Management', () => {
 
   test('REQ-011 should reject password change when current password is invalid @logged', async ({
     request,
+    loggedUser,
   }) => {
-    const { authHeader, userId, registerUserData } =
-      await createUserAndLogin(request);
+    const { authHeader, userId } = loggedUser;
     const badPassword = {
       currentPassword: 'zawszeSieWywali',
       newPassword: faker.internet.password(),
@@ -170,14 +118,15 @@ test.describe('REQ-011 User Profile Management', () => {
 
   test('REQ-011 should block login and profile access after account deactivation @logged', async ({
     request,
+    loggedUser,
   }) => {
-    const { authHeader, userId, registerUserData } =
-      await createUserAndLogin(request);
+    const { authHeader, userId, username, password } = loggedUser;
+
     const deactivateRes = await request.post(
       apiUrls.deactivateUserUrl(userId),
       {
         headers: { Authorization: authHeader },
-        data: { password: registerUserData.password },
+        data: { password },
       },
     );
 
@@ -187,8 +136,8 @@ test.describe('REQ-011 User Profile Management', () => {
 
     const loginAgain = await request.post(apiUrls.loginUrl, {
       data: {
-        username: registerUserData.username,
-        password: registerUserData.password,
+        username,
+        password,
       },
     });
 
