@@ -1,72 +1,47 @@
-# Sprint Test Plan (API Business Requirements)
+# Business API Test Plan
 
-## 1. Scope każdego pliku
+## Scope
 
-### req-011-user-profile
+This plan focuses only on business API scenarios and the mapping in `cases.md`.
 
-- GET profilu zalogowanego usera
-- PUT update profilu + re-read i porównanie zmian
-- PUT password happy path
-- PUT password z błędnym starym hasłem (negative)
-- POST deactivate (na końcu testu lub osobny scenariusz)
+Target scenario files:
 
-### req-007-funds
+- `req-011-user-profile`
+- `req-007-funds`
+- `req-019-public-profile`
+- `req-003-progress`
+- `req-017-demo-preview`
 
-- GET funds (stan początkowy)
-- PUT funds z poprawną kwotą
-- GET funds po update (musi się zmienić)
-- GET funds history (musi pojawić się wpis)
-- PUT funds dla wartości spoza zakresu (negative)
+## Scenario Rules
 
-### req-019-public-profile
+- At least 3 tests per file.
+- At least 1 positive and 1 negative test.
+- Each test should verify business impact, not only status code.
+- No test-to-test dependency.
+- Test names must use the `REQ-xxx` prefix.
 
-- GET public profile bez tokena
-- Weryfikacja, że pola publiczne są dostępne
-- Weryfikacja, że pola wrażliwe nie są zwracane
+## Technical Rules
 
-### req-003-progress
+- Use `beforeEach` + system restore for state-changing tests.
+- Use shared fixtures/helpers for authentication.
+- Keep assertions domain-focused (before/after state validation).
+- Keep test data isolated for parallel execution.
 
-- GET progress przed akcją
-- Complete lesson
-- GET progress po akcji (wzrost albo zmiana completion)
-- Ponowne logowanie i GET progress (persistencja)
+## Execution Workflow
 
-### req-017-demo-preview
+1. Implement one scenario file.
+2. Run only that file.
+3. Fix failures until stable.
+4. Move to the next file.
 
-- GET preview bez logowania
-- GET full lesson content bez logowania (oczekiwane ograniczenie)
-- Porównanie zakresu danych preview vs full content
+Run command:
 
-## 2. Definicja Done dla każdego pliku
-
-- Minimum 3 testy w pliku.
-- Co najmniej 1 test pozytywny i 1 negatywny.
-- Każdy test łączy minimum 2 endpointy albo ma wyraźny before/after.
-- Brak zależności test-test (idempotencja).
-- Czytelne nazwy testów z prefixem REQ-xxx.
-
-## 3. Standard techniczny
-
-- beforeEach z restore DB dla testów modyfikujących stan.
-- Jeden helper logowania jako standard (`loginAndGetUser`).
-- Asercje domenowe, nie tylko status.
-- Każdy test kończy się walidacją skutku biznesowego.
-
-## 4. Rytm pracy
-
-1. Napisz 1 plik.
-2. Uruchom tylko ten plik.
-3. Popraw do zielonego.
-4. Dopiero przejdź do kolejnego.
-
-Polecenie per plik:
-
-```
-npx playwright test tests/api/business/<nazwa-pliku>.spec.ts --project=api
+```bash
+npx playwright test tests/api/business/<file-name>.spec.ts --project=api
 ```
 
-## 5. Checkpointy mentoringowe
+## Quality Checklist
 
-- Czy test wykryłby regresję biznesową, czy tylko błąd status code?
-- Czy można go uruchomić 5 razy z rzędu bez flaky?
-- Czy nowa osoba z zespołu zrozumie „co biznesowo chroni ten test"?
+- Would this test catch a business regression?
+- Can the file pass repeatedly without flakes?
+- Is the business intent clear for a new team member?

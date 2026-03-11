@@ -5,7 +5,6 @@ export const apiUrls = {
   authStatusUrl: '/api/learning/auth/status',
   coursesUrl: '/api/learning/courses',
   courseSearchUrl: '/api/learning/courses/search',
-  certificatesUrl: `/api/learning/certificates`,
 
   courseByIdUrl: (courseId: number) => `/api/learning/courses/${courseId}`,
   courseRatingsUrl: (courseId: number) =>
@@ -16,8 +15,6 @@ export const apiUrls = {
 
   courseEnrollUrl: (courseId: number) =>
     `/api/learning/courses/${courseId}/enroll`,
-  userEnrollmentsUrl: (userId: number) =>
-    `/api/learning/users/${userId}/enrollments`,
 
   courseLessonsUrl: (courseId: number) =>
     `/api/learning/courses/${courseId}/lessons`,
@@ -29,13 +26,6 @@ export const apiUrls = {
     `/api/learning/courses/${courseId}/lessons/${lessonId}/content`,
   lessonCompleteUrl: (courseId: number, lessonId: number) =>
     `/api/learning/courses/${courseId}/lessons/${lessonId}/complete`,
-
-  userCertificatesUrl: (userId: number) =>
-    `/api/learning/users/${userId}/certificates`,
-  generateCertificateUrl: (courseId: number) =>
-    `/api/learning/courses/${courseId}/certificate`,
-  publicCertificateUrl: (uuid: string) =>
-    `/api/learning/public/certificates/${uuid}`,
 
   getUserProfileUrl: (userId: number) => `/api/learning/users/${userId}`,
   putUserProfileUrl: (userId: number) =>

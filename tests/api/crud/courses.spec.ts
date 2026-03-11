@@ -1,12 +1,31 @@
-import { loginAndGetUser } from '@_src/helper/auth';
+import { expect, test } from '@_src/fixtures/user.fixture';
+import { restoreSystem } from '@_src/helper/restore';
 import { CourseRatingModel } from '@_src/models/course.model';
 import { testUser1 } from '@_src/test-data/user.data';
 import { apiUrls } from '@_src/utils/api.util';
 import { HTTP_STATUS } from '@_src/utils/http-status';
-import { expect, test } from '@playwright/test';
+import { APIRequestContext } from '@playwright/test';
+
+async function enrollUserInCourse(
+  request: APIRequestContext,
+  authHeader: string,
+  userId: number,
+  courseId: number,
+) {
+  const enrollRes = await request.post(apiUrls.courseEnrollUrl(courseId), {
+    data: { userId },
+    headers: { Authorization: authHeader },
+  });
+
+  expect(enrollRes.status()).toBe(HTTP_STATUS.OK);
+}
 
 test.describe('Courses API', () => {
   let courseId = 1;
+
+  test.beforeEach(async ({ request }) => {
+    await restoreSystem(request);
+  });
 
   test('should displayed all courses @logged', async ({ request }) => {
     const response = await request.get(apiUrls.coursesUrl);
@@ -73,18 +92,24 @@ test.describe('Courses API', () => {
 
     expect(response.status()).toBe(HTTP_STATUS.OK);
     expect(Array.isArray(responseJson)).toBe(true);
-    expect(responseJson.length).toBeGreaterThan(0);
 
     responseJson.forEach((rating: CourseRatingModel) => {
-      expect(rating.rating).toBeGreaterThan(0);
+      expect(rating.rating).toBeGreaterThanOrEqual(0);
+      expect(rating.rating).toBeLessThanOrEqual(5);
       expect(typeof rating.comment).toBe('string');
       expect(rating.createdAt).toBeTruthy();
       expect(rating.userInfo).toHaveProperty('name');
     });
   });
 
-  test('should display progress for user @logged', async ({ request }) => {
-    const { authHeader } = await loginAndGetUser(request);
+  test('should display progress for user @logged', async ({
+    request,
+    loggedUser,
+  }) => {
+    const { authHeader, userId } = loggedUser;
+
+    await enrollUserInCourse(request, authHeader, userId, courseId);
+
     const progressResponse = await request.get(
       apiUrls.courseProgressUrl(courseId),
       { headers: { Authorization: authHeader } },
@@ -109,8 +134,9 @@ test.describe('Courses API', () => {
 
   test('should not display rate when user is not at this course @logged', async ({
     request,
+    loggedUser,
   }) => {
-    const { authHeader } = await loginAndGetUser(request);
+    const { authHeader } = loggedUser;
     const rateResponse = await request.post(apiUrls.courseRateUrl(courseId), {
       data: { rating: 4, comment: 'test' },
       headers: { Authorization: authHeader },

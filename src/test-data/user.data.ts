@@ -7,6 +7,6 @@ export const testUser1: LoginUserModel = {
 };
 
 export const testUserIncorrect: LoginUserModel = {
-  username: 'ziomuś',
+  username: 'invalid_user',
   password: USER_PASSWORD,
 };
