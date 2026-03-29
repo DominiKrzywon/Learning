@@ -8,7 +8,7 @@ test.describe('Login API', () => {
   test.beforeEach(async ({ request }) => {
     const restoreRes = await request.get('/api/learning/system/restore2');
     expect(restoreRes.status()).toBe(HTTP_STATUS.OK);
-    // make sure the shared user exists after the reset
+
     const registerRes = await request.post(apiUrls.registerUrl, {
       data: testUser1,
     });
@@ -18,6 +18,7 @@ test.describe('Login API', () => {
       HTTP_STATUS.UNPROCESSABLE,
     ]).toContain(registerRes.status());
   });
+  
   test.afterEach(async ({ request }) => {
     const restoreRes = await request.get('/api/learning/system/restore2');
     expect(restoreRes.status()).toBe(HTTP_STATUS.OK);

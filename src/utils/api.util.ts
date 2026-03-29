@@ -10,7 +10,7 @@ export const apiUrls = {
   courseRatingsUrl: (courseId: number) =>
     `/api/learning/courses/${courseId}/ratings`,
   courseProgressUrl: (courseId: number) =>
-    `/api/learning/courses/${courseId}/progress`,
+    `/api/learning/courses/${courseId}/lessons/progress`,
   courseRateUrl: (courseId: number) => `/api/learning/courses/${courseId}/rate`,
 
   courseEnrollUrl: (courseId: number) =>
