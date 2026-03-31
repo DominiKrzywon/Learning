@@ -6,11 +6,11 @@ This plan focuses only on business API scenarios and the mapping in `cases.md`.
 
 Target scenario files:
 
-- `req-011-user-profile`
-- `req-007-funds`
-- `req-019-public-profile`
-- `req-003-progress`
-- `req-017-demo-preview`
+- `req-003-progress` — **DONE** (3 tests)
+- `req-007-funds` — **DONE** (3 tests)
+- `req-011-user-profile` — **DONE** (4 tests)
+- `req-017-demo-preview` — **DONE** (4 tests)
+- `req-019-public-profile` — TODO
 
 ## Scenario Rules
 
@@ -19,6 +19,8 @@ Target scenario files:
 - Each test should verify business impact, not only status code.
 - No test-to-test dependency.
 - Test names must use the `REQ-xxx` prefix.
+- Use `should ...` naming style (e.g. `REQ-017 should return preview lessons without authentication`).
+- Tag tests requiring login with `@logged`.
 
 ## Technical Rules
 
@@ -26,6 +28,7 @@ Target scenario files:
 - Use shared fixtures/helpers for authentication.
 - Keep assertions domain-focused (before/after state validation).
 - Keep test data isolated for parallel execution.
+
 
 ## Execution Workflow
 
