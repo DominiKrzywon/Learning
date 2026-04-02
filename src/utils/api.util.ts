@@ -28,6 +28,8 @@ export const apiUrls = {
     `/api/learning/courses/${courseId}/lessons/${lessonId}/complete`,
 
   getUserProfileUrl: (userId: number) => `/api/learning/users/${userId}`,
+  getPublicUserProfileUrl: (userId: number) =>
+    `/api/learning/public/users/${userId}`,
   putUserProfileUrl: (userId: number) =>
     `/api/learning/users/${userId}/profile`,
   updateUserPasswordUrl: (userId: number) =>
