@@ -3,7 +3,7 @@ import { loginAndGetUser } from '@_src/helper/auth';
 import { TestUser } from '@_src/types/test-user.type';
 import { apiUrls } from '@_src/utils/api.util';
 import { HTTP_STATUS } from '@_src/utils/http-status';
-import { APIRequestContext, expect } from '@playwright/test';
+import { APIRequestContext, APIResponse, expect } from '@playwright/test';
 
 export async function createUserAndLogin(
   request: APIRequestContext,
@@ -26,4 +26,11 @@ export async function createUserAndLogin(
     username: registerUserData.username,
     password: registerUserData.password,
   };
+}
+
+export async function getPublicUserProfileJson(
+  request: APIRequestContext,
+  userId: number,
+): Promise<APIResponse> {
+  return await request.get(apiUrls.getPublicUserProfileUrl(userId));
 }
