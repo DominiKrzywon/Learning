@@ -18,23 +18,20 @@ test.describe('REQ-007 Funds', () => {
     loggedUser,
   }) => {
     const { authHeader, userId } = loggedUser;
+    const { res, json } = await getUserFunds(request, authHeader, userId);
 
-    const fundsBeforeUpdate = await getUserFunds(request, authHeader, userId);
-    expect(fundsBeforeUpdate.status()).toBe(HTTP_STATUS.OK);
+    expect(res.status()).toBe(HTTP_STATUS.OK);
+    expect(json.funds).toBeLessThanOrEqual(fundsTestData.zeroAmount);
 
-    const fundsDataJson = await fundsBeforeUpdate.json();
-    expect(fundsDataJson.funds).toBeLessThanOrEqual(fundsTestData.zeroAmount);
-
-    const updatedFunds = await updateUserFunds(
+    const { resUpdate, jsonUpdate } = await updateUserFunds(
       request,
       authHeader,
       userId,
       fundsTestData.validAmount,
     );
-    expect(updatedFunds.status()).toBe(HTTP_STATUS.OK);
 
-    const updatedFundsJson = await updatedFunds.json();
-    expect(updatedFundsJson.newBalance).toEqual(fundsTestData.validAmount);
+    expect(resUpdate.status()).toBe(HTTP_STATUS.OK);
+    expect(jsonUpdate.newBalance).toEqual(fundsTestData.validAmount);
   });
 
   test('REQ-007 should create a transaction history entry after fund update @logged', async ({
@@ -42,36 +39,30 @@ test.describe('REQ-007 Funds', () => {
     loggedUser,
   }) => {
     const { authHeader, userId } = loggedUser;
+    const { resHistory: resHistoryBefore, jsonHistory: jsonHistoryBefore } =
+      await getFundsHistory(request, authHeader, userId);
 
-    const historyData = await getFundsHistory(request, authHeader, userId);
-    expect(historyData.status()).toBe(HTTP_STATUS.OK);
+    expect(resHistoryBefore.status()).toBe(HTTP_STATUS.OK);
+    expect(Array.isArray(jsonHistoryBefore.history)).toBe(true);
+    expect(jsonHistoryBefore.history).toHaveLength(fundsTestData.zeroAmount);
 
-    const historyDataJson = await historyData.json();
-    expect(Array.isArray(historyDataJson.history)).toBe(true);
-    expect(historyDataJson.history).toHaveLength(fundsTestData.zeroAmount);
-
-    const updateFunds = await updateUserFunds(
+    const { resUpdate, jsonUpdate } = await updateUserFunds(
       request,
       authHeader,
       userId,
       fundsTestData.validAmount,
     );
-    expect(updateFunds.status()).toBe(HTTP_STATUS.OK);
 
-    const updateFundsJson = await updateFunds.json();
-    expect(updateFundsJson.newBalance).toEqual(fundsTestData.validAmount);
+    expect(resUpdate.status()).toBe(HTTP_STATUS.OK);
+    expect(jsonUpdate.newBalance).toEqual(fundsTestData.validAmount);
 
-    const getUpdatedHistory = await getFundsHistory(
-      request,
-      authHeader,
-      userId,
+    const { resHistory: resHistoryAfter, jsonHistory: jsonHistoryAfter } =
+      await getFundsHistory(request, authHeader, userId);
+
+    expect(resHistoryAfter.status()).toBe(HTTP_STATUS.OK);
+    expect(jsonHistoryAfter.history[fundsTestData.zeroAmount].amount).toEqual(
+      fundsTestData.validAmount,
     );
-    expect(getUpdatedHistory.status()).toBe(HTTP_STATUS.OK);
-
-    const getUpdatedHistoryJson = await getUpdatedHistory.json();
-    expect(
-      getUpdatedHistoryJson.history[fundsTestData.zeroAmount].amount,
-    ).toEqual(fundsTestData.validAmount);
   });
 
   test('REQ-007 should reject out-of-range amount @logged', async ({
@@ -81,53 +72,52 @@ test.describe('REQ-007 Funds', () => {
     const { authHeader, userId } = loggedUser;
 
     await test.step('should accept 0 amount', async () => {
-      const updateUserFundsZero = await updateUserFunds(
+      const { resUpdate, jsonUpdate } = await updateUserFunds(
         request,
         authHeader,
         userId,
         fundsTestData.zeroAmount,
       );
-      expect(updateUserFundsZero.status()).toBe(HTTP_STATUS.OK);
-
-      const updateUserFundsZeroJson = await updateUserFundsZero.json();
-      expect(updateUserFundsZeroJson.newBalance).toEqual(
-        fundsTestData.zeroAmount,
-      );
+      expect(resUpdate.status()).toBe(HTTP_STATUS.OK);
+      expect(jsonUpdate.newBalance).toEqual(fundsTestData.zeroAmount);
     });
 
     await test.step('should reject negative amount', async () => {
-      const updateUserFundsZero = await updateUserFunds(
+      const { resUpdate } = await updateUserFunds(
         request,
         authHeader,
         userId,
         fundsTestData.negativeAmount,
       );
-      expect(updateUserFundsZero.status()).toBe(HTTP_STATUS.BAD_REQUEST);
+      expect(resUpdate.status()).toBe(HTTP_STATUS.BAD_REQUEST);
 
-      const updateUserFundsZeroJson = await updateUserFundsZero.json();
+      const updateUserFundsZeroJson = await resUpdate.json();
       expect(updateUserFundsZeroJson.error).toBeTruthy();
     });
 
     await test.step('should reject extremely high amount', async () => {
-      const updateUserFundsZero = await updateUserFunds(
+      const { resUpdate } = await updateUserFunds(
         request,
         authHeader,
         userId,
         fundsTestData.excessiveAmount,
       );
-      expect(updateUserFundsZero.status()).toBe(HTTP_STATUS.BAD_REQUEST);
+      expect(resUpdate.status()).toBe(HTTP_STATUS.BAD_REQUEST);
 
-      const updateUserFundsZeroJson = await updateUserFundsZero.json();
+      const updateUserFundsZeroJson = await resUpdate.json();
       expect(updateUserFundsZeroJson.error).toBeTruthy();
     });
 
     await test.step('should record only successful update in history', async () => {
-      const getHistory = await getFundsHistory(request, authHeader, userId);
-      expect(getHistory.status()).toBe(HTTP_STATUS.OK);
+      const { resHistory, jsonHistory } = await getFundsHistory(
+        request,
+        authHeader,
+        userId,
+      );
 
-      const getHistoryJson = await getHistory.json();
-      expect(Array.isArray(getHistoryJson.history)).toBe(true);
-      expect(getHistoryJson.history.length).toEqual(0);
+      expect(resHistory.status()).toBe(HTTP_STATUS.OK);
+      expect(Array.isArray(jsonHistory.history)).toBe(true);
+      expect(jsonHistory.history.length).toEqual(0);
     });
   });
 });
