@@ -1,6 +1,7 @@
 import { expect, test } from '@_src/fixtures/user.fixture';
 import { restoreSystem } from '@_src/helper/restore';
 import { CourseRatingModel } from '@_src/models/course.model';
+import { courseData } from '@_src/test-data/course.data';
 import { testUser1 } from '@_src/test-data/user.data';
 import { apiUrls } from '@_src/utils/api.util';
 import { HTTP_STATUS } from '@_src/utils/http-status';
@@ -21,8 +22,7 @@ async function enrollUserInCourse(
 }
 
 test.describe('Courses API', () => {
-  let courseId = 1;
-
+  let courseId = courseData.defaultCourseId;
   test.beforeEach(async ({ request }) => {
     await restoreSystem(request);
   });
@@ -43,7 +43,7 @@ test.describe('Courses API', () => {
   });
 
   test('should return course details by ID', async ({ request }) => {
-    const courseId = 4;
+    const courseId = courseData.fourthCourseId;
     const response = await request.get(apiUrls.courseByIdUrl(courseId));
     const responseJson = await response.json();
 
@@ -76,7 +76,7 @@ test.describe('Courses API', () => {
   });
 
   test('should not displayed course with ID 9999', async ({ request }) => {
-    const courseId = 9999;
+    const courseId = courseData.nonExistingCourseId;
     const response = await request.get(apiUrls.courseByIdUrl(courseId));
     const responseBody = await response.text();
     const responseJson = JSON.parse(responseBody);
@@ -86,7 +86,7 @@ test.describe('Courses API', () => {
   });
 
   test('should displayed course ratings @logged', async ({ request }) => {
-    const courseId = 2;
+    const courseId = courseData.secondCourseId;
     const response = await request.get(apiUrls.courseRatingsUrl(courseId));
     const responseJson = await response.json();
 

@@ -3,10 +3,11 @@ import { enrollAndGetFirstLessonId } from '@_src/helper/enroll-lesson';
 import { getPreviewLessons } from '@_src/helper/preview';
 import { restoreSystem } from '@_src/helper/restore';
 import { LessonModel } from '@_src/models/lessons.model';
+import { courseData } from '@_src/test-data/course.data';
 import { apiUrls } from '@_src/utils/api.util';
 import { HTTP_STATUS } from '@_src/utils/http-status';
 
-const courseId = 1;
+const courseId = courseData.defaultCourseId;
 
 test.describe('REQ-017 Free Demo Preview', () => {
   test.beforeEach(async ({ request }) => {

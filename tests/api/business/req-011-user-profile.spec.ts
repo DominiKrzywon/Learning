@@ -20,9 +20,8 @@ test.describe('REQ-011 User Profile Management', () => {
     const updatedEmail = faker.internet.email();
 
     const updatePayload = {
-      ...userProfileData,
+      ...userProfileData(password),
       email: updatedEmail,
-      currentPassword: password,
     };
 
     const updateRes = await request.put(apiUrls.putUserProfileUrl(userId), {

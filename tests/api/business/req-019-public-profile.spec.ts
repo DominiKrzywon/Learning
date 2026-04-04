@@ -9,7 +9,7 @@ test.describe('REQ-019 Public User Profile', () => {
     await restoreSystem(request);
   });
 
-  test('REQ-019 should return public profile without authentication', async ({
+  test('REQ-019 should return public profile without authentication @logged', async ({
     request,
     loggedUser,
   }) => {
@@ -36,7 +36,7 @@ test.describe('REQ-019 Public User Profile', () => {
     expect(Array.isArray(publicUserJson.ratings)).toBe(true);
   });
 
-  test('REQ-019 should not expose sensitive data in public profile', async ({
+  test('REQ-019 should not expose sensitive data in public profile @logged', async ({
     request,
     loggedUser,
   }) => {
@@ -59,7 +59,7 @@ test.describe('REQ-019 Public User Profile', () => {
     expect(publicUserJson.isPublic).toBeUndefined();
   });
 
-  test('REQ-019 should return 404 for private profile', async ({
+  test('REQ-019 should return 404 for private profile @logged', async ({
     request,
     loggedUser,
   }) => {

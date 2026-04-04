@@ -13,7 +13,7 @@ test.describe('REQ-007 Funds', () => {
     await restoreSystem(request);
   });
 
-  test('REQ-007 should read balance and update funds correctly', async ({
+  test('REQ-007 should read balance and update funds correctly @logged', async ({
     request,
     loggedUser,
   }) => {
@@ -37,7 +37,7 @@ test.describe('REQ-007 Funds', () => {
     expect(updatedFundsJson.newBalance).toEqual(fundsTestData.validAmount);
   });
 
-  test('REQ-007 should create a transaction history entry after fund update', async ({
+  test('REQ-007 should create a transaction history entry after fund update @logged', async ({
     request,
     loggedUser,
   }) => {
@@ -74,7 +74,7 @@ test.describe('REQ-007 Funds', () => {
     ).toEqual(fundsTestData.validAmount);
   });
 
-  test('REQ-007 should reject out-of-range amount', async ({
+  test('REQ-007 should reject out-of-range amount @logged', async ({
     request,
     loggedUser,
   }) => {

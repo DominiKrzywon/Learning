@@ -4,17 +4,18 @@ import { enrollAndGetFirstLessonId } from '@_src/helper/enroll-lesson';
 import { getProgressEntry } from '@_src/helper/progress';
 import { restoreSystem } from '@_src/helper/restore';
 import { LessonModel } from '@_src/models/lessons.model';
+import { courseData } from '@_src/test-data/course.data';
 import { apiUrls } from '@_src/utils/api.util';
 import { HTTP_STATUS } from '@_src/utils/http-status';
 
 test.describe('REQ-003 User Progress Monitor', () => {
-  const courseId = 1;
+  const courseId = courseData.defaultCourseId;
 
   test.beforeEach(async ({ request }) => {
     await restoreSystem(request);
   });
 
-  test('REQ-003 progress calculation, modification', async ({
+  test('REQ-003 should track progress after lesson completion @logged', async ({
     request,
     loggedUser,
   }) => {
@@ -51,7 +52,7 @@ test.describe('REQ-003 User Progress Monitor', () => {
     expect(afterEntry?.completedAt).toBeTruthy();
   });
 
-  test('REQ-003 check progress after logout', async ({
+  test('REQ-003 should persist progress after relogin @logged', async ({
     request,
     loggedUser,
   }) => {
@@ -92,7 +93,7 @@ test.describe('REQ-003 User Progress Monitor', () => {
     expect(checkProgressAfter?.completedAt).toBeTruthy();
   });
 
-  test('REQ-003 complete lesson for non-enrolled course returns error', async ({
+  test('REQ-003 should reject lesson completion for non-enrolled course @logged', async ({
     request,
     loggedUser,
   }) => {

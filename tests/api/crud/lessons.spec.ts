@@ -5,6 +5,7 @@ import {
   QuizContent,
   ReadingContent,
 } from '@_src/models/lessons.model';
+import { courseData } from '@_src/test-data/course.data';
 import { apiUrls } from '@_src/utils/api.util';
 import { HTTP_STATUS } from '@_src/utils/http-status';
 import { APIRequestContext } from '@playwright/test';
@@ -24,7 +25,7 @@ async function enrollUserInCourse(
 }
 
 test.describe('Lessons API', () => {
-  const courseId = 1;
+  const courseId = courseData.defaultCourseId;
 
   test.beforeEach(async ({ request }) => {
     await restoreSystem(request);
