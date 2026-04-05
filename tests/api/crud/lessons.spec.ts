@@ -1,5 +1,5 @@
 import { expect, test } from '@_src/fixtures/user.fixture';
-import { enrollOnLesson } from '@_src/helper/enroll-lesson';
+import { enrollInCourse } from '@_src/helper/enroll';
 import { restoreSystem } from '@_src/helper/restore';
 import {
   LessonModel,
@@ -17,7 +17,9 @@ test.describe('Lessons API', () => {
     await restoreSystem(request);
   });
 
-  test('unauthorized user cannot take a lesson', async ({ request }) => {
+  test('should deny lesson access for unauthorized user', async ({
+    request,
+  }) => {
     const response = await request.get(apiUrls.courseLessonsUrl(courseId));
     const responseJson = await response.json();
 
@@ -33,7 +35,7 @@ test.describe('Lessons API', () => {
   }) => {
     const { authHeader, userId } = loggedUser;
 
-    await enrollOnLesson(request, authHeader, userId, courseId);
+    await enrollInCourse(request, authHeader, userId, courseId);
 
     const response = await request.get(apiUrls.courseLessonsUrl(courseId), {
       headers: { Authorization: authHeader },
@@ -72,7 +74,7 @@ test.describe('Lessons API', () => {
     });
   });
 
-  test('take a title of lessons', async ({ request }) => {
+  test('should return lesson titles', async ({ request }) => {
     const response = await request.get(
       apiUrls.courseLessonsTitlesUrl(courseId),
     );
@@ -86,7 +88,7 @@ test.describe('Lessons API', () => {
     });
   });
 
-  test('take a preview of lessons', async ({ request }) => {
+  test('should return preview lessons', async ({ request }) => {
     const response = await request.get(
       apiUrls.courseLessonsPreviewUrl(courseId),
     );
@@ -101,13 +103,13 @@ test.describe('Lessons API', () => {
     );
   });
 
-  test('should get lesson content with authorize user', async ({
+  test('should get lesson content with authorized user', async ({
     request,
     loggedUser,
   }) => {
     const { authHeader, userId } = loggedUser;
 
-    await enrollOnLesson(request, authHeader, userId, courseId);
+    await enrollInCourse(request, authHeader, userId, courseId);
 
     const response = await request.get(apiUrls.courseLessonsUrl(courseId), {
       headers: { Authorization: authHeader },
@@ -129,13 +131,13 @@ test.describe('Lessons API', () => {
     expect(typeof getContextJson.content.transcript).toBe('string');
   });
 
-  test('check the lesson as completed as an authorize user', async ({
+  test('should mark lesson as completed for authorized user', async ({
     request,
     loggedUser,
   }) => {
     const { authHeader, userId } = loggedUser;
 
-    await enrollOnLesson(request, authHeader, userId, courseId);
+    await enrollInCourse(request, authHeader, userId, courseId);
 
     const response = await request.get(apiUrls.courseLessonsUrl(courseId), {
       headers: { Authorization: authHeader },

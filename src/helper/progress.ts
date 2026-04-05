@@ -17,3 +17,4 @@ export async function getProgressEntry(
 
   return entry;
 }
+

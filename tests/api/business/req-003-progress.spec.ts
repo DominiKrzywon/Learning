@@ -1,6 +1,6 @@
 import { expect, test } from '@_src/fixtures/user.fixture';
 import { completeLesson } from '@_src/helper/complete-lesson';
-import { enrollAndGetFirstLessonId } from '@_src/helper/enroll-lesson';
+import { enrollAndGetFirstLessonId } from '@_src/helper/enroll';
 import { getProgressEntry } from '@_src/helper/progress';
 import { restoreSystem } from '@_src/helper/restore';
 import { LessonModel } from '@_src/models/lessons.model';

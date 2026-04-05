@@ -24,3 +24,8 @@ export interface QuizContent {
     correct: number;
   }>;
 }
+
+export interface PreviewLessonsResponse {
+  previewLessons: LessonModel[];
+  totalLessons: number;
+}

@@ -25,7 +25,7 @@ export async function enrollAndGetFirstLessonId(
   return lessonJson[0].id;
 }
 
-export async function enrollOnLesson(
+export async function enrollInCourse(
   request: APIRequestContext,
   authHeader: string,
   userId: number,

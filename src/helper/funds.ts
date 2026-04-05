@@ -1,5 +1,4 @@
 import {
-  FundsHistoryEntry,
   GetFundsHistoryResponse,
   GetFundsResponse,
   UpdateFundsResponse,

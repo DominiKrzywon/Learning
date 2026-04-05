@@ -1,5 +1,5 @@
 import { expect, test } from '@_src/fixtures/user.fixture';
-import { enrollAndGetFirstLessonId } from '@_src/helper/enroll-lesson';
+import { enrollAndGetFirstLessonId } from '@_src/helper/enroll';
 import { getPreviewLessons } from '@_src/helper/preview';
 import { restoreSystem } from '@_src/helper/restore';
 import { LessonModel } from '@_src/models/lessons.model';
@@ -17,17 +17,19 @@ test.describe('REQ-017 Free Demo Preview', () => {
   test('REQ-017 should return preview lessons without authentication', async ({
     request,
   }) => {
-    const previewLessons = await getPreviewLessons(request, courseId);
-    expect(previewLessons.status()).toBe(HTTP_STATUS.OK);
+    const { resPreviewLessons, jsonPreviewLessons } = await getPreviewLessons(
+      request,
+      courseId,
+    );
+    expect(resPreviewLessons.status()).toBe(HTTP_STATUS.OK);
 
-    const responseJson = await previewLessons.json();
-    expect(Array.isArray(responseJson.previewLessons)).toBe(true);
-    expect(typeof responseJson.totalLessons).toBe('number');
-    expect(responseJson.previewLessons.length).toBeLessThan(
-      responseJson.totalLessons,
+    expect(Array.isArray(jsonPreviewLessons.previewLessons)).toBe(true);
+    expect(typeof jsonPreviewLessons.totalLessons).toBe('number');
+    expect(jsonPreviewLessons.previewLessons.length).toBeLessThan(
+      jsonPreviewLessons.totalLessons,
     );
 
-    responseJson.previewLessons.forEach((lesson: LessonModel) => {
+    jsonPreviewLessons.previewLessons.forEach((lesson: LessonModel) => {
       expect(typeof lesson.id).toBe('number');
       expect(typeof lesson.title).toBe('string');
       expect(typeof lesson.type).toBe('string');
@@ -40,11 +42,10 @@ test.describe('REQ-017 Free Demo Preview', () => {
     request,
     loggedUser,
   }) => {
-    const previewLesson = await getPreviewLessons(request, courseId);
-    const previewLessonJson = await previewLesson.json();
+    const { jsonPreviewLessons } = await getPreviewLessons(request, courseId);
 
-    const previewCount = previewLessonJson.previewLessons.length;
-    const totalLessons = previewLessonJson.totalLessons;
+    const previewCount = jsonPreviewLessons.previewLessons.length;
+    const totalLessons = jsonPreviewLessons.totalLessons;
 
     const { authHeader, userId } = loggedUser;
 
@@ -90,9 +91,8 @@ test.describe('REQ-017 Free Demo Preview', () => {
   test('REQ-017 should deny full lesson content without authentication', async ({
     request,
   }) => {
-    const previewLesson = await getPreviewLessons(request, courseId);
-    const previewLessonJson = await previewLesson.json();
-    const previewLessonId = previewLessonJson.previewLessons[0].id;
+    const { jsonPreviewLessons } = await getPreviewLessons(request, courseId);
+    const previewLessonId = jsonPreviewLessons.previewLessons[0].id;
 
     const wrongGetContent = await request.get(
       apiUrls.lessonContentUrl(courseId, previewLessonId),

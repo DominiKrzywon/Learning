@@ -1,5 +1,5 @@
 import { expect, test } from '@_src/fixtures/user.fixture';
-import { enrollOnLesson } from '@_src/helper/enroll-lesson';
+import { enrollInCourse } from '@_src/helper/enroll';
 import { restoreSystem } from '@_src/helper/restore';
 import { CourseRatingModel } from '@_src/models/course.model';
 import { courseData } from '@_src/test-data/course.data';
@@ -13,7 +13,7 @@ test.describe('Courses API', () => {
     await restoreSystem(request);
   });
 
-  test('should displayed all courses @logged', async ({ request }) => {
+  test('should display all courses @logged', async ({ request }) => {
     const response = await request.get(apiUrls.coursesUrl);
     const responseJson = await response.json();
 
@@ -61,7 +61,7 @@ test.describe('Courses API', () => {
     expect(typeof responseJson.rating).toBe('number');
   });
 
-  test('should not displayed course with ID 9999', async ({ request }) => {
+  test('should not display a non-existing course', async ({ request }) => {
     const courseId = courseData.nonExistingCourseId;
     const response = await request.get(apiUrls.courseByIdUrl(courseId));
     const responseBody = await response.text();
@@ -71,7 +71,7 @@ test.describe('Courses API', () => {
     expect(responseJson.error.message).toBe('Course not found');
   });
 
-  test('should displayed course ratings @logged', async ({ request }) => {
+  test('should display course ratings @logged', async ({ request }) => {
     const courseId = courseData.secondCourseId;
     const response = await request.get(apiUrls.courseRatingsUrl(courseId));
     const responseJson = await response.json();
@@ -94,7 +94,7 @@ test.describe('Courses API', () => {
   }) => {
     const { authHeader, userId } = loggedUser;
 
-    await enrollOnLesson(request, authHeader, userId, courseId);
+    await enrollInCourse(request, authHeader, userId, courseId);
 
     const progressResponse = await request.get(
       apiUrls.courseProgressUrl(courseId),
@@ -106,7 +106,7 @@ test.describe('Courses API', () => {
     expect(typeof progress.progress).toBe('number');
   });
 
-  test('should not display progress for not authorized user @logged', async ({
+  test('should not display progress for unauthorized user @logged', async ({
     request,
   }) => {
     const response = await request.post(apiUrls.loginUrl, { data: testUser1 });
