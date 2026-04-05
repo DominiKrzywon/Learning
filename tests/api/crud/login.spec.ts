@@ -1,64 +1,50 @@
+import { AuthApi } from '@_src/api/auth.api';
 import { prepareRandomUser } from '@_src/factory/user.factory';
 import { restoreSystem } from '@_src/helper/restore';
 import { testUser1, testUserIncorrect } from '@_src/test-data/user.data';
-import { apiUrls } from '@_src/utils/api.util';
 import { HTTP_STATUS } from '@_src/utils/http-status';
 import { expect, test } from '@playwright/test';
+
+let authApi: AuthApi;
 
 test.describe('Login API', () => {
   test.beforeEach(async ({ request }) => {
     await restoreSystem(request);
+    authApi = new AuthApi(request);
   });
 
-  test('should login with valid credentials @logged', async ({ request }) => {
-    const response = await request.post(apiUrls.loginUrl, {
-      data: testUser1,
-    });
+  test('should login with valid credentials @logged', async () => {
+    const { resLogin, jsonLogin } = await authApi.login(testUser1);
 
-    const responseJson = await response.json();
-
-    expect(response.status()).toBe(HTTP_STATUS.OK);
-    expect(responseJson.success).toBe(true);
-    expect(responseJson.access_token).toBeTruthy();
+    expect(resLogin.status()).toBe(HTTP_STATUS.OK);
+    expect(jsonLogin.success).toBe(true);
+    expect(jsonLogin.access_token).toBeTruthy();
   });
 
-  test('should not login with incorrect credentials @logged', async ({
-    request,
-  }) => {
-    const response = await request.post(apiUrls.loginUrl, {
-      data: testUserIncorrect,
-    });
+  test('should not login with incorrect credentials @logged', async () => {
+    const { resLogin, jsonLogin } = await authApi.login(testUserIncorrect);
+    const expectedErrorMessage = 'Invalid credentials';
 
-    expect(response.status()).toBe(HTTP_STATUS.UNAUTHORIZED);
+    expect(resLogin.status()).toBe(HTTP_STATUS.UNAUTHORIZED);
+    expect(jsonLogin).toHaveProperty('error.message', expectedErrorMessage);
   });
 
-  test('should successfully login after registration @logged', async ({
-    request,
-  }) => {
+  test('should successfully login after registration @logged', async () => {
     const registerUserData = prepareRandomUser();
-    await test.step('verify register', async () => {
-      const response = await request.post(apiUrls.registerUrl, {
-        data: registerUserData,
-      });
 
-      const responseJson = await response.json();
+    const { resRegister, jsonRegister } =
+      await authApi.register(registerUserData);
 
-      expect(response.status()).toBe(HTTP_STATUS.OK);
-      expect(responseJson.success).toBe(true);
+    expect(resRegister.status()).toBe(HTTP_STATUS.OK);
+    expect(jsonRegister.success).toBe(true);
+
+    const { resLogin, jsonLogin } = await authApi.login({
+      username: registerUserData.username,
+      password: registerUserData.password,
     });
-    await test.step('verify login', async () => {
-      const response = await request.post(apiUrls.loginUrl, {
-        data: {
-          username: registerUserData.username,
-          password: registerUserData.password,
-        },
-      });
 
-      const responseJson = await response.json();
-
-      expect(response.status()).toBe(HTTP_STATUS.OK);
-      expect(responseJson.success).toBe(true);
-      expect(responseJson.access_token).toBeTruthy();
-    });
+    expect(resLogin.status()).toBe(HTTP_STATUS.OK);
+    expect(jsonLogin.success).toBe(true);
+    expect(jsonLogin.access_token).toBeTruthy();
   });
 });
