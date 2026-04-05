@@ -1,4 +1,5 @@
 import { expect, test } from '@_src/fixtures/user.fixture';
+import { enrollOnLesson } from '@_src/helper/enroll-lesson';
 import { restoreSystem } from '@_src/helper/restore';
 import {
   LessonModel,
@@ -8,21 +9,6 @@ import {
 import { courseData } from '@_src/test-data/course.data';
 import { apiUrls } from '@_src/utils/api.util';
 import { HTTP_STATUS } from '@_src/utils/http-status';
-import { APIRequestContext } from '@playwright/test';
-
-async function enrollUserInCourse(
-  request: APIRequestContext,
-  authHeader: string,
-  userId: number,
-  courseId: number,
-) {
-  const enrollRes = await request.post(apiUrls.courseEnrollUrl(courseId), {
-    headers: { Authorization: authHeader },
-    data: { userId },
-  });
-
-  expect(enrollRes.status()).toBe(HTTP_STATUS.OK);
-}
 
 test.describe('Lessons API', () => {
   const courseId = courseData.defaultCourseId;
@@ -47,7 +33,7 @@ test.describe('Lessons API', () => {
   }) => {
     const { authHeader, userId } = loggedUser;
 
-    await enrollUserInCourse(request, authHeader, userId, courseId);
+    await enrollOnLesson(request, authHeader, userId, courseId);
 
     const response = await request.get(apiUrls.courseLessonsUrl(courseId), {
       headers: { Authorization: authHeader },
@@ -121,7 +107,7 @@ test.describe('Lessons API', () => {
   }) => {
     const { authHeader, userId } = loggedUser;
 
-    await enrollUserInCourse(request, authHeader, userId, courseId);
+    await enrollOnLesson(request, authHeader, userId, courseId);
 
     const response = await request.get(apiUrls.courseLessonsUrl(courseId), {
       headers: { Authorization: authHeader },
@@ -149,7 +135,7 @@ test.describe('Lessons API', () => {
   }) => {
     const { authHeader, userId } = loggedUser;
 
-    await enrollUserInCourse(request, authHeader, userId, courseId);
+    await enrollOnLesson(request, authHeader, userId, courseId);
 
     const response = await request.get(apiUrls.courseLessonsUrl(courseId), {
       headers: { Authorization: authHeader },

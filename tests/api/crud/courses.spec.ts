@@ -1,25 +1,11 @@
 import { expect, test } from '@_src/fixtures/user.fixture';
+import { enrollOnLesson } from '@_src/helper/enroll-lesson';
 import { restoreSystem } from '@_src/helper/restore';
 import { CourseRatingModel } from '@_src/models/course.model';
 import { courseData } from '@_src/test-data/course.data';
 import { testUser1 } from '@_src/test-data/user.data';
 import { apiUrls } from '@_src/utils/api.util';
 import { HTTP_STATUS } from '@_src/utils/http-status';
-import { APIRequestContext } from '@playwright/test';
-
-async function enrollUserInCourse(
-  request: APIRequestContext,
-  authHeader: string,
-  userId: number,
-  courseId: number,
-) {
-  const enrollRes = await request.post(apiUrls.courseEnrollUrl(courseId), {
-    data: { userId },
-    headers: { Authorization: authHeader },
-  });
-
-  expect(enrollRes.status()).toBe(HTTP_STATUS.OK);
-}
 
 test.describe('Courses API', () => {
   let courseId = courseData.defaultCourseId;
@@ -108,7 +94,7 @@ test.describe('Courses API', () => {
   }) => {
     const { authHeader, userId } = loggedUser;
 
-    await enrollUserInCourse(request, authHeader, userId, courseId);
+    await enrollOnLesson(request, authHeader, userId, courseId);
 
     const progressResponse = await request.get(
       apiUrls.courseProgressUrl(courseId),

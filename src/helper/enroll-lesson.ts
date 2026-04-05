@@ -1,18 +1,18 @@
 import { apiUrls } from '@_src/utils/api.util';
-import { APIRequestContext } from '@playwright/test';
+import { APIRequestContext, APIResponse } from '@playwright/test';
 
 export async function enrollAndGetFirstLessonId(
   request: APIRequestContext,
   authHeader: string,
   userId: number,
   courseId: number,
-) {
+): Promise<number> {
   const enroll = await request.post(apiUrls.courseEnrollUrl(courseId), {
     data: { userId },
     headers: { Authorization: authHeader },
   });
   if (!enroll.ok()) {
-    throw new Error('Enroll on course failed');
+    throw new Error('Enroll on course failed!');
   }
 
   const getLessons = await request.get(apiUrls.courseLessonsUrl(courseId), {
@@ -23,4 +23,21 @@ export async function enrollAndGetFirstLessonId(
   }
   const lessonJson = await getLessons.json();
   return lessonJson[0].id;
+}
+
+export async function enrollOnLesson(
+  request: APIRequestContext,
+  authHeader: string,
+  userId: number,
+  courseId: number,
+): Promise<APIResponse> {
+  const enroll = await request.post(apiUrls.courseEnrollUrl(courseId), {
+    data: { userId },
+    headers: { Authorization: authHeader },
+  });
+  if (!enroll.ok()) {
+    throw new Error('Enroll on course failed!');
+  }
+
+  return enroll;
 }

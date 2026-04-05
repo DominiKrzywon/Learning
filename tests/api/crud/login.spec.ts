@@ -1,4 +1,5 @@
 import { prepareRandomUser } from '@_src/factory/user.factory';
+import { restoreSystem } from '@_src/helper/restore';
 import { testUser1, testUserIncorrect } from '@_src/test-data/user.data';
 import { apiUrls } from '@_src/utils/api.util';
 import { HTTP_STATUS } from '@_src/utils/http-status';
@@ -6,22 +7,7 @@ import { expect, test } from '@playwright/test';
 
 test.describe('Login API', () => {
   test.beforeEach(async ({ request }) => {
-    const restoreRes = await request.get('/api/learning/system/restore2');
-    expect(restoreRes.status()).toBe(HTTP_STATUS.OK);
-
-    const registerRes = await request.post(apiUrls.registerUrl, {
-      data: testUser1,
-    });
-    expect([
-      HTTP_STATUS.OK,
-      HTTP_STATUS.BAD_REQUEST,
-      HTTP_STATUS.UNPROCESSABLE,
-    ]).toContain(registerRes.status());
-  });
-  
-  test.afterEach(async ({ request }) => {
-    const restoreRes = await request.get('/api/learning/system/restore2');
-    expect(restoreRes.status()).toBe(HTTP_STATUS.OK);
+    await restoreSystem(request);
   });
 
   test('should login with valid credentials @logged', async ({ request }) => {
