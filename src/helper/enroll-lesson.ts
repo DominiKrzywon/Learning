@@ -1,6 +1,5 @@
 import { apiUrls } from '@_src/utils/api.util';
-import { HTTP_STATUS } from '@_src/utils/http-status';
-import { APIRequestContext, expect } from '@playwright/test';
+import { APIRequestContext } from '@playwright/test';
 
 export async function enrollAndGetFirstLessonId(
   request: APIRequestContext,
@@ -12,13 +11,16 @@ export async function enrollAndGetFirstLessonId(
     data: { userId },
     headers: { Authorization: authHeader },
   });
-  expect(enroll.status()).toBe(HTTP_STATUS.OK);
+  if (!enroll.ok()) {
+    throw new Error('Enroll on course failed');
+  }
 
   const getLessons = await request.get(apiUrls.courseLessonsUrl(courseId), {
     headers: { Authorization: authHeader },
   });
-  expect(getLessons.status()).toBe(HTTP_STATUS.OK);
-
+  if (!getLessons.ok()) {
+    throw new Error('Getting lessons failed: access denied');
+  }
   const lessonJson = await getLessons.json();
   return lessonJson[0].id;
 }
