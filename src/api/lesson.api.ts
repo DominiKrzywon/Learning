@@ -10,7 +10,7 @@ export class LessonApi {
 
   async getLessons(
     courseId: number,
-  ): Promise<{ responseLessons: APIResponse; jsonLessons: LessonModel[] }> {
+  ): Promise<{ responseLessons: APIResponse; jsonLessons: any }> {
     const responseLessons = await this.request.get(
       apiUrls.courseLessonsUrl(courseId),
       { headers: { Authorization: this.authHeader! } },
