@@ -1,4 +1,5 @@
 import { AuthApi } from '@_src/api/auth.api';
+import { CourseApi } from '@_src/api/course.api';
 import { prepareRandomUser } from '@_src/factory/user.factory';
 import { restoreSystem } from '@_src/helper/restore';
 import { testUser1, testUserIncorrect } from '@_src/test-data/user.data';
@@ -7,10 +8,12 @@ import { expect, test } from '@playwright/test';
 
 let authApi: AuthApi;
 
+
 test.describe('Login API', () => {
   test.beforeEach(async ({ request }) => {
     await restoreSystem(request);
     authApi = new AuthApi(request);
+
   });
 
   test('should login with valid credentials @logged', async () => {

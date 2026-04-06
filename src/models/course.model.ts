@@ -28,3 +28,8 @@ export interface CourseRatingModel {
     id: number;
   };
 }
+
+export interface CreateRatingPayload {
+  rating: number;
+  comment: string;
+}
