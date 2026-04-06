@@ -126,10 +126,13 @@ test.describe('Courses API', () => {
   }) => {
     const courseApiWithAuth = new CourseApi(request, loggedUser.authHeader);
     const payload = { rating: 4, comment: 'test' };
-    const { response, json } = await courseApiWithAuth.rate(courseId, payload);
+    const { responseRate, jsonRate } = await courseApiWithAuth.rate(
+      courseId,
+      payload,
+    );
     const expectedErrorMessage = 'User not authorized';
 
-    expect(response.status()).toBe(HTTP_STATUS.FORBIDDEN);
-    expect(json.error.message).toBe(expectedErrorMessage);
+    expect(responseRate.status()).toBe(HTTP_STATUS.FORBIDDEN);
+    expect(jsonRate.error.message).toBe(expectedErrorMessage);
   });
 });

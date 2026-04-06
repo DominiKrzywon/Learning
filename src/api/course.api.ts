@@ -38,14 +38,17 @@ export class CourseApi {
   async rate(
     courseId: number,
     payload: CreateRatingPayload,
-  ): Promise<{ response: APIResponse; json: any }> {
-    const response = await this.request.post(apiUrls.courseRateUrl(courseId), {
-      data: payload,
-      headers: { Authorization: this.authHeader! },
-    });
-    const json = await response.json();
+  ): Promise<{ responseRate: APIResponse; jsonRate: any }> {
+    const responseRate = await this.request.post(
+      apiUrls.courseRateUrl(courseId),
+      {
+        data: payload,
+        headers: { Authorization: this.authHeader! },
+      },
+    );
+    const jsonRate = await responseRate.json();
 
-    return { response, json };
+    return { responseRate, jsonRate };
   }
 
   async enrollCourse(
