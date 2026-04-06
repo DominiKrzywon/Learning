@@ -11,3 +11,13 @@ export interface RegisterUserModel {
   lastName: string;
   avatar: string;
 }
+
+export interface UserProfileResponse {
+  id: number;
+  username: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  avatar: string;
+  isPublic: boolean;
+}
