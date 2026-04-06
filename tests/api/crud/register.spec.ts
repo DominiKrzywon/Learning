@@ -26,7 +26,6 @@ test.describe('Registration API', () => {
 
   test('should not register with a created username @logged', async () => {
     registerUserData = prepareRandomUser({ username: USER_NAME });
-    
     const expectedErrorMessage =
       'User already exists with that username or email';
     const { resRegister, jsonRegister } =
@@ -38,7 +37,6 @@ test.describe('Registration API', () => {
 
   test('should not register with incorrect data - not email provided @logged', async () => {
     registerUserData.username = USER_NAME;
-
     const expectedErrorMessage =
       'User already exists with that username or email';
     const { resRegister, jsonRegister } =
