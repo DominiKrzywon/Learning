@@ -1,7 +1,6 @@
 import {
   GetFundsHistoryResponse,
   GetFundsResponse,
-  UpdateFundsResponse,
 } from '@_src/models/funds.model';
 import { apiUrls } from '@_src/utils/api.util';
 import { APIRequestContext, APIResponse } from '@playwright/test';
@@ -28,7 +27,7 @@ export class FundsApi {
     amount: number,
   ): Promise<{
     resUpdateFunds: APIResponse;
-    jsonUpdateFunds: UpdateFundsResponse;
+    jsonUpdateFunds: any;
   }> {
     const resUpdateFunds = await this.request.put(
       apiUrls.putUserFundsUrl(userId),
