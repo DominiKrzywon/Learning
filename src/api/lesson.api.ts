@@ -49,7 +49,7 @@ export class LessonApi {
     lessonId: number,
   ): Promise<{
     responseContent: APIResponse;
-    jsonContent: { content: { videoUrl: string; transcript: string } };
+    jsonContent: any;
   }> {
     const responseContent = await this.request.get(
       apiUrls.lessonContentUrl(courseId, lessonId),
