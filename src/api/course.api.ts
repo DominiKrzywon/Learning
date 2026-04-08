@@ -1,5 +1,4 @@
 import { CreateRatingPayload } from '@_src/models/course.model';
-import { ProgressModel } from '@_src/models/progress.model';
 import { apiUrls } from '@_src/utils/api.util';
 import { APIRequestContext, APIResponse } from '@playwright/test';
 
@@ -68,7 +67,7 @@ export class CourseApi {
 
   async getProgress(
     courseId: number,
-  ): Promise<{ responseProgress: APIResponse; jsonProgress: ProgressModel[] }> {
+  ): Promise<{ responseProgress: APIResponse; jsonProgress: any }> {
     const responseProgress = await this.request.get(
       apiUrls.courseProgressUrl(courseId),
       { headers: { Authorization: this.authHeader! } },
