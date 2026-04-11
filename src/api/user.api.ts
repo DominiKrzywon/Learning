@@ -1,4 +1,3 @@
-import { UserProfileResponse } from '@_src/models/user.model';
 import { apiUrls } from '@_src/utils/api.util';
 import { APIRequestContext, APIResponse } from '@playwright/test';
 
@@ -10,10 +9,11 @@ export class UserApi {
 
   async getProfile(userId: number): Promise<{
     resGetProfile: APIResponse;
-    jsonGetProfile: UserProfileResponse;
+    jsonGetProfile: any;
   }> {
     const resGetProfile = await this.request.get(
       apiUrls.getUserProfileUrl(userId),
+      { headers: { Authorization: this.authHeader! } },
     );
     const jsonGetProfile = await resGetProfile.json();
 

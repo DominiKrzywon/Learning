@@ -1,8 +1,9 @@
+import { UserApi } from '@_src/api/user.api';
 import { expect, test } from '@_src/fixtures/user.fixture';
 import { restoreSystem } from '@_src/helper/restore';
-import { getPublicUserProfileJson } from '@_src/helper/user';
-import { apiUrls } from '@_src/utils/api.util';
 import { HTTP_STATUS } from '@_src/utils/http-status';
+
+let userApi: UserApi;
 
 test.describe('REQ-019 Public User Profile', () => {
   test.beforeEach(async ({ request }) => {
@@ -13,63 +14,75 @@ test.describe('REQ-019 Public User Profile', () => {
     request,
     loggedUser,
   }) => {
+    const successMessage = 'Profile updated successfully';
     const { authHeader, userId } = loggedUser;
+    userApi = new UserApi(request, authHeader);
 
-    const setToPublic = await request.put(apiUrls.putUserProfileUrl(userId), {
-      headers: { Authorization: authHeader },
-      data: { currentPassword: loggedUser.password, isPublic: true },
-    });
+    const profilePayload = {
+      currentPassword: loggedUser.password,
+      isPublic: true,
+    };
+    const { resUpdateProfile, jsonUpdateProfile } = await userApi.updateProfile(
+      userId,
+      profilePayload,
+    );
+    const { resGetPublicProfile, jsonGetPublicProfile } =
+      await userApi.getPublicProfile(userId);
 
-    const getPublicUser = await getPublicUserProfileJson(request, userId);
-    const publicUserJson = await getPublicUser.json();
-
-    expect(setToPublic.status()).toBe(HTTP_STATUS.OK);
-    expect(getPublicUser.status()).toBe(HTTP_STATUS.OK);
-    expect(typeof publicUserJson.id).toBe('number');
-    expect(typeof publicUserJson.firstName).toBe('string');
-    expect(typeof publicUserJson.lastName).toBe('string');
-    expect(typeof publicUserJson.avatar).toBe('string');
-    expect(typeof publicUserJson.joinDate).toBe('string');
-    expect(typeof publicUserJson.role).toBe('string');
-    expect(Array.isArray(publicUserJson.enrollments)).toBe(true);
-    expect(Array.isArray(publicUserJson.certificates)).toBe(true);
-    expect(Array.isArray(publicUserJson.ratings)).toBe(true);
+    expect(resUpdateProfile.status()).toBe(HTTP_STATUS.OK);
+    expect(resGetPublicProfile.status()).toBe(HTTP_STATUS.OK);
+    expect(jsonUpdateProfile.message).toBe(successMessage);
+    expect(typeof jsonGetPublicProfile.id).toBe('number');
+    expect(typeof jsonGetPublicProfile.firstName).toBe('string');
+    expect(typeof jsonGetPublicProfile.lastName).toBe('string');
+    expect(typeof jsonGetPublicProfile.avatar).toBe('string');
+    expect(typeof jsonGetPublicProfile.joinDate).toBe('string');
+    expect(typeof jsonGetPublicProfile.role).toBe('string');
+    expect(Array.isArray(jsonGetPublicProfile.enrollments)).toBe(true);
+    expect(Array.isArray(jsonGetPublicProfile.certificates)).toBe(true);
+    expect(Array.isArray(jsonGetPublicProfile.ratings)).toBe(true);
   });
 
   test('REQ-019 should not expose sensitive data in public profile @logged', async ({
     request,
     loggedUser,
   }) => {
+    const successMessage = 'Profile updated successfully';
     const { authHeader, userId } = loggedUser;
+    userApi = new UserApi(request, authHeader);
 
-    const setToPublic = await request.put(apiUrls.putUserProfileUrl(userId), {
-      headers: { Authorization: authHeader },
-      data: { currentPassword: loggedUser.password, isPublic: true },
-    });
+    const profilePayload = {
+      currentPassword: loggedUser.password,
+      isPublic: true,
+    };
+    const { resUpdateProfile, jsonUpdateProfile } = await userApi.updateProfile(
+      userId,
+      profilePayload,
+    );
+    const { resGetPublicProfile, jsonGetPublicProfile } =
+      await userApi.getPublicProfile(userId);
 
-    const getPublicUser = await getPublicUserProfileJson(request, userId);
-    const publicUserJson = await getPublicUser.json();
-
-    expect(setToPublic.status()).toBe(HTTP_STATUS.OK);
-    expect(getPublicUser.status()).toBe(HTTP_STATUS.OK);
-
-    expect(publicUserJson.username).toBeUndefined();
-    expect(publicUserJson.email).toBeUndefined();
-    expect(publicUserJson.password).toBeUndefined();
-    expect(publicUserJson.isPublic).toBeUndefined();
+    expect(resUpdateProfile.status()).toBe(HTTP_STATUS.OK);
+    expect(resGetPublicProfile.status()).toBe(HTTP_STATUS.OK);
+    expect(jsonUpdateProfile.message).toBe(successMessage);
+    expect(jsonGetPublicProfile.username).toBeUndefined();
+    expect(jsonGetPublicProfile.email).toBeUndefined();
+    expect(jsonGetPublicProfile.password).toBeUndefined();
+    expect(jsonGetPublicProfile.isPublic).toBeUndefined();
   });
 
   test('REQ-019 should return 404 for private profile @logged', async ({
     request,
     loggedUser,
   }) => {
-    const { userId } = loggedUser;
+    const { authHeader, userId } = loggedUser;
+    userApi = new UserApi(request, authHeader);
 
-    const getPublicUser = await getPublicUserProfileJson(request, userId);
-    const publicUserJson = await getPublicUser.json();
+    const { resGetPublicProfile, jsonGetPublicProfile } =
+      await userApi.getPublicProfile(userId);
 
-    expect(getPublicUser.status()).toBe(HTTP_STATUS.NOT_FOUND);
-    expect(publicUserJson.error.message).toBe(
+    expect(resGetPublicProfile.status()).toBe(HTTP_STATUS.NOT_FOUND);
+    expect(jsonGetPublicProfile.error.message).toBe(
       'Profile not found or is private',
     );
   });
