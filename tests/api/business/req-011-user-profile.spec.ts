@@ -2,7 +2,10 @@ import { AuthApi } from '@_src/api/auth.api';
 import { UserApi } from '@_src/api/user.api';
 import { expect, test } from '@_src/fixtures/user.fixture';
 import { restoreSystem } from '@_src/helper/restore';
-import { userProfileData } from '@_src/test-data/user.profile.data';
+import {
+  invalid_password,
+  userProfileData,
+} from '@_src/test-data/user.profile.data';
 import { HTTP_STATUS } from '@_src/utils/http-status';
 import { faker } from '@faker-js/faker';
 
@@ -89,9 +92,8 @@ test.describe('REQ-011 User Profile Management', () => {
     const { authHeader, userId } = loggedUser;
     userApi = new UserApi(request, authHeader);
 
-    const errorPassword = 'bad123';
     const badPassword = {
-      currentPassword: errorPassword,
+      currentPassword: invalid_password,
       newPassword: faker.internet.password(),
     };
 

@@ -313,14 +313,14 @@ currentPassword: 'zawszeSieWywali'; // req-011 test 3
 Add to `src/test-data/user.profile.data.ts`:
 
 ```ts
-export const INVALID_PASSWORD = 'invalid-password-for-testing';
+export const invalid_password = 'invalid-password-for-testing';
 ```
 
 Use in test:
 
 ```ts
 const badPassword = {
-  currentPassword: INVALID_PASSWORD,
+  currentPassword: invalid_password,
   newPassword: faker.internet.password(),
 };
 ```

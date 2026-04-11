@@ -7,3 +7,5 @@ export function userProfileData(currentPassword: string) {
     isPublic: false,
   } as const;
 }
+
+export const invalid_password = 'badPassword123'

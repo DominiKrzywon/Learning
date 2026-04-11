@@ -24,10 +24,3 @@ export async function createUserAndLogin(
     password: registerUserData.password,
   };
 }
-
-export async function getPublicUserProfileJson(
-  request: APIRequestContext,
-  userId: number,
-): Promise<APIResponse> {
-  return await request.get(apiUrls.getPublicUserProfileUrl(userId));
-}

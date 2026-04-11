@@ -5,7 +5,6 @@ import { expect, test } from '@_src/fixtures/user.fixture';
 import { restoreSystem } from '@_src/helper/restore';
 import { LessonModel } from '@_src/models/lessons.model';
 import { courseData } from '@_src/test-data/course.data';
-import { testUser1 } from '@_src/test-data/user.data';
 import { HTTP_STATUS } from '@_src/utils/http-status';
 
 let courseApi: CourseApi;
@@ -63,7 +62,7 @@ test.describe('REQ-003 User Progress Monitor', () => {
     request,
     loggedUser,
   }) => {
-    const { authHeader, userId } = loggedUser;
+    const { authHeader, userId, username, password } = loggedUser;
     lessonApi = new LessonApi(request, authHeader);
     courseApi = new CourseApi(request, authHeader);
     authApi = new AuthApi(request);
@@ -80,7 +79,7 @@ test.describe('REQ-003 User Progress Monitor', () => {
 
     const { responseProgress, jsonProgress } =
       await courseApi.getProgress(courseId);
-    const { resLogin, jsonLogin } = await authApi.login(testUser1);
+    const { resLogin, jsonLogin } = await authApi.login({ username, password });
     const {
       responseProgress: afterResponseProgress,
       jsonProgress: afterJsonProgress,
