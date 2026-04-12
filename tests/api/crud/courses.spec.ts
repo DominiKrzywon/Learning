@@ -5,6 +5,7 @@ import { restoreSystem } from '@_src/helper/restore';
 import { CourseRatingModel } from '@_src/models/course.model';
 import { courseData } from '@_src/test-data/course.data';
 import { testUser1 } from '@_src/test-data/user.data';
+import { expectStatusOK, expectSuccess } from '@_src/utils/assertions';
 import { HTTP_STATUS } from '@_src/utils/http-status';
 
 let courseApi: CourseApi;
@@ -23,7 +24,7 @@ test.describe('Courses API', () => {
     const { resGetAll, jsonGetAll } = await courseApi.getAll();
     const firstCourse = jsonGetAll[0];
 
-    expect(resGetAll.status()).toBe(HTTP_STATUS.OK);
+    expectStatusOK(resGetAll);
     expect(Array.isArray(jsonGetAll)).toBe(true);
     expect(jsonGetAll.length).toBeGreaterThan(0);
     expect(firstCourse.id).toBeTruthy();
@@ -36,7 +37,7 @@ test.describe('Courses API', () => {
     const courseId = courseData.fourthCourseId;
     const { resGetById, jsonGetById } = await courseApi.getById(courseId);
 
-    expect(resGetById.status()).toBe(HTTP_STATUS.OK);
+    expectStatusOK(resGetById);
     expect(jsonGetById).toMatchObject({
       id: 4,
       title: 'Playwright Automation Testing',
@@ -79,7 +80,7 @@ test.describe('Courses API', () => {
     const { resGetRatings, jsonGetRatings } =
       await courseApi.getRatings(courseId);
 
-    expect(resGetRatings.status()).toBe(HTTP_STATUS.OK);
+    expectStatusOK(resGetRatings);
     expect(Array.isArray(jsonGetRatings)).toBe(true);
     jsonGetRatings.forEach((rating: CourseRatingModel) => {
       expect(rating.rating).toBeGreaterThanOrEqual(0);
@@ -103,10 +104,10 @@ test.describe('Courses API', () => {
     const { resGetProgress, jsonGetProgress } =
       await courseApi.getProgress(courseId);
 
-    expect(jsonEnroll.success).toBe(true);
+    expectSuccess(jsonEnroll);
     expect(jsonEnroll.enrollment.progress).toEqual(0);
-    expect(resGetProgress.status()).toBe(HTTP_STATUS.OK);
-    expect(resEnroll.status()).toBe(HTTP_STATUS.OK);
+    expectStatusOK(resGetProgress);
+    expectStatusOK(resEnroll);
     expect(Array.isArray(jsonGetProgress)).toBe(true);
     expect(jsonGetProgress.length).toBe(zeroAmount);
   });
@@ -115,8 +116,8 @@ test.describe('Courses API', () => {
     const { resLogin, jsonLogin } = await authApi.login(testUser1);
     const { resGetProgress } = await courseApi.getProgress(courseId);
 
-    expect(jsonLogin.success).toBe(true);
-    expect(resLogin.status()).toBe(HTTP_STATUS.OK);
+    expectSuccess(jsonLogin);
+    expectStatusOK(resLogin);
     expect(resGetProgress).toBeDefined();
     expect(resGetProgress.status()).toBe(HTTP_STATUS.FORBIDDEN);
   });

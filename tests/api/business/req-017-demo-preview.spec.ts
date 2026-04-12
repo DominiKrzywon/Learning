@@ -4,6 +4,7 @@ import { expect, test } from '@_src/fixtures/user.fixture';
 import { restoreSystem } from '@_src/helper/restore';
 import { LessonModel } from '@_src/models/lessons.model';
 import { courseData } from '@_src/test-data/course.data';
+import { expectStatusOK, expectSuccess } from '@_src/utils/assertions';
 import { HTTP_STATUS } from '@_src/utils/http-status';
 
 let lessonApi: LessonApi;
@@ -22,7 +23,7 @@ test.describe('REQ-017 Free Demo Preview', () => {
     const { resGetPreview, jsonGetPreview } =
       await lessonApi.getPreview(courseId);
 
-    expect(resGetPreview.status()).toBe(HTTP_STATUS.OK);
+    expectStatusOK(resGetPreview);
     expect(Array.isArray(jsonGetPreview.previewLessons)).toBe(true);
     expect(typeof jsonGetPreview.totalLessons).toBe('number');
     expect(jsonGetPreview.previewLessons.length).toBeLessThan(
@@ -55,10 +56,10 @@ test.describe('REQ-017 Free Demo Preview', () => {
     const { resGetLessons, jsonGetLessons } =
       await lessonApi.getLessons(courseId);
 
-    expect(resGetPreview.status()).toBe(HTTP_STATUS.OK);
-    expect(resEnroll.status()).toBe(HTTP_STATUS.OK);
-    expect(resGetLessons.status()).toBe(HTTP_STATUS.OK);
-    expect(jsonEnroll.enrollment.completed).toBe(false);
+    expectStatusOK(resGetPreview);
+    expectStatusOK(resEnroll);
+    expectStatusOK(resGetLessons);
+    expectSuccess(jsonEnroll);
     expect(jsonGetLessons.length).toEqual(totalLessons);
     expect(jsonGetLessons.length).toBeGreaterThan(previewCount);
   });
@@ -80,9 +81,9 @@ test.describe('REQ-017 Free Demo Preview', () => {
       lessonId,
     );
 
-    expect(resEnroll.status()).toBe(HTTP_STATUS.OK);
-    expect(resGetLessons.status()).toBe(HTTP_STATUS.OK);
-    expect(resGetContent.status()).toBe(HTTP_STATUS.OK);
+    expectStatusOK(resEnroll);
+    expectStatusOK(resGetLessons);
+    expectStatusOK(resGetContent);
     expect(jsonGetContent.content).toBeDefined();
     expect(typeof jsonGetContent.content).toBe('object');
   });
@@ -101,7 +102,7 @@ test.describe('REQ-017 Free Demo Preview', () => {
       previewLessonId,
     );
 
-    expect(resGetPreview.status()).toBe(HTTP_STATUS.OK);
+    expectStatusOK(resGetPreview);
     expect(resGetContent.status()).toBe(HTTP_STATUS.BAD_REQUEST);
     expect(jsonGetContent.error.message).toBeTruthy();
   });

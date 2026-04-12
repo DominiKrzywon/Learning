@@ -6,6 +6,7 @@ import {
   invalid_password,
   userProfileData,
 } from '@_src/test-data/user.profile.data';
+import { expectStatusOK, expectSuccess } from '@_src/utils/assertions';
 import { HTTP_STATUS } from '@_src/utils/http-status';
 import { faker } from '@faker-js/faker';
 
@@ -42,9 +43,9 @@ test.describe('REQ-011 User Profile Management', () => {
     const { resGetProfile, jsonGetProfile } =
       await newUserApi.getProfile(userId);
 
-    expect(resUpdateProfile.status()).toBe(HTTP_STATUS.OK);
-    expect(resGetProfile.status()).toBe(HTTP_STATUS.OK);
-    expect(jsonUpdateProfile.success).toBe(true);
+    expectStatusOK(resUpdateProfile);
+    expectStatusOK(resGetProfile);
+    expectSuccess(jsonUpdateProfile);
     expect(jsonGetProfile.email).toBe(updatedEmail);
   });
 
@@ -77,9 +78,9 @@ test.describe('REQ-011 User Profile Management', () => {
         password,
       });
 
-    expect(resChangePassword.status()).toBe(HTTP_STATUS.OK);
-    expect(jsonChangePassword.success).toBe(true);
-    expect(resLogin.status()).toBe(HTTP_STATUS.OK);
+    expectStatusOK(resChangePassword);
+    expectSuccess(jsonChangePassword);
+    expectStatusOK(resLogin);
     expect(jsonLogin.access_token).toBeTruthy();
     expect(resLoginOld.status()).toBe(HTTP_STATUS.UNAUTHORIZED);
     expect(jsonLoginOld.error.message).toBe(expectedErrorMessage);
@@ -121,8 +122,8 @@ test.describe('REQ-011 User Profile Management', () => {
     const { resLogin, jsonLogin } = await authApi.login({ username, password });
     const { resGetProfile, jsonGetProfile } = await userApi.getProfile(userId);
 
-    expect(resDeactivate.status()).toBe(HTTP_STATUS.OK);
-    expect(jsonDeactivate.success).toBe(true);
+    expectStatusOK(resDeactivate);
+    expectSuccess(jsonDeactivate);
     expect(resLogin.status()).toBe(HTTP_STATUS.UNAUTHORIZED);
     expect(jsonLogin.error.message).toBe(expectedLoginError);
     expect([HTTP_STATUS.UNAUTHORIZED, HTTP_STATUS.FORBIDDEN]).toContain(

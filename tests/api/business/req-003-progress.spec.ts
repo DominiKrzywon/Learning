@@ -5,6 +5,7 @@ import { expect, test } from '@_src/fixtures/user.fixture';
 import { restoreSystem } from '@_src/helper/restore';
 import { LessonModel } from '@_src/models/lessons.model';
 import { courseData } from '@_src/test-data/course.data';
+import { expectStatusOK, expectSuccess } from '@_src/utils/assertions';
 import { HTTP_STATUS } from '@_src/utils/http-status';
 
 let courseApi: CourseApi;
@@ -46,12 +47,12 @@ test.describe('REQ-003 User Progress Monitor', () => {
       jsonGetProgress: afterJsonGetProgress,
     } = await courseApi.getProgress(courseId);
 
-    expect(beforeResGetProgress.status()).toBe(HTTP_STATUS.OK);
+    expectStatusOK(beforeResGetProgress);
     expect(beforeJsonGetProgress.length).toBe(0);
-    expect(resEnroll.status()).toBe(HTTP_STATUS.OK);
-    expect(resGetLessons.status()).toBe(HTTP_STATUS.OK);
-    expect(resComplete.status()).toBe(HTTP_STATUS.OK);
-    expect(afterResGetProgress.status()).toBe(HTTP_STATUS.OK);
+    expectStatusOK(resEnroll);
+    expectStatusOK(resGetLessons);
+    expectStatusOK(resComplete);
+    expectStatusOK(afterResGetProgress);
     expect(afterJsonGetProgress[0].completed).toBe(true);
     expect(afterJsonGetProgress[0].lessonId).toBe(lessonId);
     expect(afterJsonGetProgress[0].courseId).toBe(courseId);
@@ -85,15 +86,15 @@ test.describe('REQ-003 User Progress Monitor', () => {
       jsonGetProgress: afterJsonGetProgress,
     } = await courseApi.getProgress(courseId);
 
-    expect(resEnroll.status()).toBe(HTTP_STATUS.OK);
-    expect(resGetLessons.status()).toBe(HTTP_STATUS.OK);
-    expect(resComplete.status()).toBe(HTTP_STATUS.OK);
-    expect(resLogin.status()).toBe(HTTP_STATUS.OK);
-    expect(afterResGetProgress.status()).toBe(HTTP_STATUS.OK);
+    expectStatusOK(resEnroll);
+    expectStatusOK(resGetLessons);
+    expectStatusOK(resComplete);
+    expectStatusOK(resLogin);
+    expectStatusOK(afterResGetProgress);
     expect(resGetProgress).toBeDefined();
-    expect(jsonComplete.success).toBe(true);
+    expectSuccess(jsonComplete);
     expect(jsonGetProgress[0].completed).toBe(true);
-    expect(jsonLogin.success).toBe(true);
+    expectSuccess(jsonLogin);
     expect(afterJsonGetProgress[0].completed).toBe(true);
   });
 
@@ -114,7 +115,7 @@ test.describe('REQ-003 User Progress Monitor', () => {
     const { resGetProgress, jsonGetProgress } =
       await courseApi.getProgress(courseId);
 
-    expect(resGetPreview.status()).toBe(HTTP_STATUS.OK);
+    expectStatusOK(resGetPreview);
     expect(Array.isArray(previewLessons)).toBe(true);
     expect(previewLessons.length).toBeGreaterThan(0);
     previewLessons.forEach((lesson: LessonModel) => {

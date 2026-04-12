@@ -3,6 +3,7 @@ import { AuthApi } from '@_src/api/auth.api';
 import { prepareRandomUser } from '@_src/factory/user.factory';
 import { restoreSystem } from '@_src/helper/restore';
 import { RegisterUserModel } from '@_src/models/user.model';
+import { expectStatusOK, expectSuccess } from '@_src/utils/assertions';
 import { HTTP_STATUS } from '@_src/utils/http-status';
 import { expect, test } from '@playwright/test';
 
@@ -20,8 +21,8 @@ test.describe('Registration API', () => {
     const { resRegister, jsonRegister } =
       await authApi.register(registerUserData);
 
-    expect(resRegister.status()).toBe(HTTP_STATUS.OK);
-    expect(jsonRegister.success).toBe(true);
+    expectStatusOK(resRegister);
+    expectSuccess(jsonRegister);
   });
 
   test('should not register with a created username @logged', async () => {

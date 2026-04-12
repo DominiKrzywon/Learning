@@ -1,6 +1,7 @@
 import { UserApi } from '@_src/api/user.api';
 import { expect, test } from '@_src/fixtures/user.fixture';
 import { restoreSystem } from '@_src/helper/restore';
+import { expectStatusOK } from '@_src/utils/assertions';
 import { HTTP_STATUS } from '@_src/utils/http-status';
 
 let userApi: UserApi;
@@ -29,8 +30,8 @@ test.describe('REQ-019 Public User Profile', () => {
     const { resGetPublicProfile, jsonGetPublicProfile } =
       await userApi.getPublicProfile(userId);
 
-    expect(resUpdateProfile.status()).toBe(HTTP_STATUS.OK);
-    expect(resGetPublicProfile.status()).toBe(HTTP_STATUS.OK);
+    expectStatusOK(resUpdateProfile);
+    expectStatusOK(resGetPublicProfile);
     expect(jsonUpdateProfile.message).toBe(successMessage);
     expect(typeof jsonGetPublicProfile.id).toBe('number');
     expect(typeof jsonGetPublicProfile.firstName).toBe('string');
@@ -62,8 +63,8 @@ test.describe('REQ-019 Public User Profile', () => {
     const { resGetPublicProfile, jsonGetPublicProfile } =
       await userApi.getPublicProfile(userId);
 
-    expect(resUpdateProfile.status()).toBe(HTTP_STATUS.OK);
-    expect(resGetPublicProfile.status()).toBe(HTTP_STATUS.OK);
+    expectStatusOK(resUpdateProfile);
+    expectStatusOK(resGetPublicProfile);
     expect(jsonUpdateProfile.message).toBe(successMessage);
     expect(jsonGetPublicProfile.username).toBeUndefined();
     expect(jsonGetPublicProfile.email).toBeUndefined();

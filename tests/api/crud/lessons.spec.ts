@@ -8,6 +8,7 @@ import {
   ReadingContent,
 } from '@_src/models/lessons.model';
 import { courseData } from '@_src/test-data/course.data';
+import { expectStatusOK, expectSuccess } from '@_src/utils/assertions';
 import { HTTP_STATUS } from '@_src/utils/http-status';
 
 test.describe('Lessons API', () => {
@@ -46,7 +47,7 @@ test.describe('Lessons API', () => {
     const { resGetLessons, jsonGetLessons } =
       await lessonApi.getLessons(courseId);
 
-    expect(resGetLessons.status()).toBe(HTTP_STATUS.OK);
+    expectStatusOK(resGetLessons);
     expect(Array.isArray(jsonGetLessons)).toBe(true);
     expect(jsonGetLessons.length).toBeGreaterThan(1);
 
@@ -82,7 +83,7 @@ test.describe('Lessons API', () => {
     const lessonApi = new LessonApi(request);
     const { resGetTitles, jsonGetTitles } = await lessonApi.getTitles(courseId);
 
-    expect(resGetTitles.status()).toBe(HTTP_STATUS.OK);
+    expectStatusOK(resGetTitles);
     expect(Array.isArray(jsonGetTitles)).toBe(true);
     jsonGetTitles.forEach((title: { id: number; title: string }) => {
       expect(typeof title.id).toBe('number');
@@ -95,7 +96,7 @@ test.describe('Lessons API', () => {
     const { resGetPreview, jsonGetPreview } =
       await lessonApi.getPreview(courseId);
 
-    expect(resGetPreview.status()).toBe(HTTP_STATUS.OK);
+    expectStatusOK(resGetPreview);
     expect(Array.isArray(jsonGetPreview.previewLessons)).toBe(true);
     expect(jsonGetPreview.previewLessons.length).toBeGreaterThan(1);
     expect(typeof jsonGetPreview.totalLessons).toBe('number');
@@ -122,8 +123,8 @@ test.describe('Lessons API', () => {
       lessonId,
     );
 
-    expect(resGetLessons.status()).toBe(HTTP_STATUS.OK);
-    expect(resGetContent.status()).toBe(HTTP_STATUS.OK);
+    expectStatusOK(resGetLessons);
+    expectStatusOK(resGetContent);
     expect(typeof jsonGetContent.content.videoUrl).toBe('string');
     expect(typeof jsonGetContent.content.transcript).toBe('string');
   });
@@ -147,8 +148,8 @@ test.describe('Lessons API', () => {
       userId,
     );
 
-    expect(resGetLessons.status()).toBe(HTTP_STATUS.OK);
-    expect(resComplete.status()).toBe(HTTP_STATUS.OK);
-    expect(jsonComplete.success).toBe(true);
+    expectStatusOK(resGetLessons);
+    expectStatusOK(resComplete);
+    expectSuccess(jsonComplete);
   });
 });

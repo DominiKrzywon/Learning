@@ -2,6 +2,7 @@ import { AuthApi } from '@_src/api/auth.api';
 import { prepareRandomUser } from '@_src/factory/user.factory';
 import { restoreSystem } from '@_src/helper/restore';
 import { testUser1, testUserIncorrect } from '@_src/test-data/user.data';
+import { expectStatusOK, expectSuccess } from '@_src/utils/assertions';
 import { HTTP_STATUS } from '@_src/utils/http-status';
 import { expect, test } from '@playwright/test';
 
@@ -16,8 +17,8 @@ test.describe('Login API', () => {
   test('should login with valid credentials @logged', async () => {
     const { resLogin, jsonLogin } = await authApi.login(testUser1);
 
-    expect(resLogin.status()).toBe(HTTP_STATUS.OK);
-    expect(jsonLogin.success).toBe(true);
+    expectStatusOK(resLogin);
+    expectSuccess(jsonLogin);
     expect(jsonLogin.access_token).toBeTruthy();
   });
 
@@ -35,16 +36,16 @@ test.describe('Login API', () => {
     const { resRegister, jsonRegister } =
       await authApi.register(registerUserData);
 
-    expect(resRegister.status()).toBe(HTTP_STATUS.OK);
-    expect(jsonRegister.success).toBe(true);
+    expectStatusOK(resRegister);
+    expectSuccess(jsonRegister);
 
     const { resLogin, jsonLogin } = await authApi.login({
       username: registerUserData.username,
       password: registerUserData.password,
     });
 
-    expect(resLogin.status()).toBe(HTTP_STATUS.OK);
-    expect(jsonLogin.success).toBe(true);
+    expectStatusOK(resLogin);
+    expectSuccess(jsonLogin);
     expect(jsonLogin.access_token).toBeTruthy();
   });
 });

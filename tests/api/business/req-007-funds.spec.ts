@@ -2,6 +2,7 @@ import { FundsApi } from '@_src/api/funds.api';
 import { expect, test } from '@_src/fixtures/user.fixture';
 import { restoreSystem } from '@_src/helper/restore';
 import { fundsTestData } from '@_src/test-data/funds.data';
+import { expectStatusOK } from '@_src/utils/assertions';
 import { HTTP_STATUS } from '@_src/utils/http-status';
 
 let fundsApi: FundsApi;
@@ -24,9 +25,9 @@ test.describe('REQ-007 Funds', () => {
       fundsTestData.validAmount,
     );
 
-    expect(resGetFunds.status()).toBe(HTTP_STATUS.OK);
+    expectStatusOK(resGetFunds);
     expect(jsonGetFunds.funds).toBeLessThanOrEqual(fundsTestData.zeroAmount);
-    expect(resUpdateFunds.status()).toBe(HTTP_STATUS.OK);
+    expectStatusOK(resUpdateFunds);
     expect(jsonUpdateFunds.newBalance).toEqual(fundsTestData.validAmount);
   });
 
@@ -47,14 +48,14 @@ test.describe('REQ-007 Funds', () => {
       jsonGetHistory: jsonGetHistoryAfter,
     } = await fundsApi.getHistory(userId);
 
-    expect(resGetHistory.status()).toBe(HTTP_STATUS.OK);
+    expectStatusOK(resGetHistory);
     expect(Array.isArray(jsonGetHistory.history)).toBe(true);
     expect(jsonGetHistory.history).toHaveLength(fundsTestData.zeroAmount);
 
-    expect(resUpdateFunds.status()).toBe(HTTP_STATUS.OK);
+    expectStatusOK(resUpdateFunds);
     expect(jsonUpdateFunds.newBalance).toEqual(fundsTestData.validAmount);
 
-    expect(resGetHistoryAfter.status()).toBe(HTTP_STATUS.OK);
+    expectStatusOK(resGetHistoryAfter);
     expect(
       jsonGetHistoryAfter.history[fundsTestData.zeroAmount].amount,
     ).toEqual(fundsTestData.validAmount);
@@ -74,7 +75,7 @@ test.describe('REQ-007 Funds', () => {
         fundsTestData.zeroAmount,
       );
 
-      expect(resUpdateFunds.status()).toBe(HTTP_STATUS.OK);
+      expectStatusOK(resUpdateFunds);
       expect(jsonUpdateFunds.newBalance).toEqual(fundsTestData.zeroAmount);
     });
 
@@ -102,7 +103,7 @@ test.describe('REQ-007 Funds', () => {
       const { resGetHistory, jsonGetHistory } =
         await fundsApi.getHistory(userId);
 
-      expect(resGetHistory.status()).toBe(HTTP_STATUS.OK);
+      expectStatusOK(resGetHistory);
       expect(Array.isArray(jsonGetHistory.history)).toBe(true);
       expect(jsonGetHistory.history.length).toEqual(0);
     });
