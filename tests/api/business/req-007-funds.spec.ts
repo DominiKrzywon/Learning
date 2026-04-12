@@ -18,14 +18,14 @@ test.describe('REQ-007 Funds', () => {
     const { authHeader, userId } = loggedUser;
     fundsApi = new FundsApi(request, authHeader);
 
-    const { resFunds, jsonFunds } = await fundsApi.getFunds(userId);
+    const { resGetFunds, jsonGetFunds } = await fundsApi.getFunds(userId);
     const { resUpdateFunds, jsonUpdateFunds } = await fundsApi.updateFunds(
       userId,
       fundsTestData.validAmount,
     );
 
-    expect(resFunds.status()).toBe(HTTP_STATUS.OK);
-    expect(jsonFunds.funds).toBeLessThanOrEqual(fundsTestData.zeroAmount);
+    expect(resGetFunds.status()).toBe(HTTP_STATUS.OK);
+    expect(jsonGetFunds.funds).toBeLessThanOrEqual(fundsTestData.zeroAmount);
     expect(resUpdateFunds.status()).toBe(HTTP_STATUS.OK);
     expect(jsonUpdateFunds.newBalance).toEqual(fundsTestData.validAmount);
   });
@@ -37,27 +37,26 @@ test.describe('REQ-007 Funds', () => {
     const { authHeader, userId } = loggedUser;
     fundsApi = new FundsApi(request, authHeader);
 
-    const { resFundsHistory, jsonFundsHistory } =
-      await fundsApi.getFundsHistory(userId);
+    const { resGetHistory, jsonGetHistory } = await fundsApi.getHistory(userId);
     const { resUpdateFunds, jsonUpdateFunds } = await fundsApi.updateFunds(
       userId,
       fundsTestData.validAmount,
     );
     const {
-      resFundsHistory: resFundsHistoryAfter,
-      jsonFundsHistory: jsonFundsHistoryAfter,
-    } = await fundsApi.getFundsHistory(userId);
+      resGetHistory: resGetHistoryAfter,
+      jsonGetHistory: jsonGetHistoryAfter,
+    } = await fundsApi.getHistory(userId);
 
-    expect(resFundsHistory.status()).toBe(HTTP_STATUS.OK);
-    expect(Array.isArray(jsonFundsHistory.history)).toBe(true);
-    expect(jsonFundsHistory.history).toHaveLength(fundsTestData.zeroAmount);
+    expect(resGetHistory.status()).toBe(HTTP_STATUS.OK);
+    expect(Array.isArray(jsonGetHistory.history)).toBe(true);
+    expect(jsonGetHistory.history).toHaveLength(fundsTestData.zeroAmount);
 
     expect(resUpdateFunds.status()).toBe(HTTP_STATUS.OK);
     expect(jsonUpdateFunds.newBalance).toEqual(fundsTestData.validAmount);
 
-    expect(resFundsHistoryAfter.status()).toBe(HTTP_STATUS.OK);
+    expect(resGetHistoryAfter.status()).toBe(HTTP_STATUS.OK);
     expect(
-      jsonFundsHistoryAfter.history[fundsTestData.zeroAmount].amount,
+      jsonGetHistoryAfter.history[fundsTestData.zeroAmount].amount,
     ).toEqual(fundsTestData.validAmount);
   });
 
@@ -100,12 +99,12 @@ test.describe('REQ-007 Funds', () => {
     });
 
     await test.step('should record only successful update in history', async () => {
-      const { resFundsHistory, jsonFundsHistory } =
-        await fundsApi.getFundsHistory(userId);
+      const { resGetHistory, jsonGetHistory } =
+        await fundsApi.getHistory(userId);
 
-      expect(resFundsHistory.status()).toBe(HTTP_STATUS.OK);
-      expect(Array.isArray(jsonFundsHistory.history)).toBe(true);
-      expect(jsonFundsHistory.history.length).toEqual(0);
+      expect(resGetHistory.status()).toBe(HTTP_STATUS.OK);
+      expect(Array.isArray(jsonGetHistory.history)).toBe(true);
+      expect(jsonGetHistory.history.length).toEqual(0);
     });
   });
 });

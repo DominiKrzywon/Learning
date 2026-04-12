@@ -19,17 +19,17 @@ test.describe('REQ-017 Free Demo Preview', () => {
     request,
   }) => {
     lessonApi = new LessonApi(request);
-    const { responsePreview, jsonPreview } =
+    const { resGetPreview, jsonGetPreview } =
       await lessonApi.getPreview(courseId);
 
-    expect(responsePreview.status()).toBe(HTTP_STATUS.OK);
-    expect(Array.isArray(jsonPreview.previewLessons)).toBe(true);
-    expect(typeof jsonPreview.totalLessons).toBe('number');
-    expect(jsonPreview.previewLessons.length).toBeLessThan(
-      jsonPreview.totalLessons,
+    expect(resGetPreview.status()).toBe(HTTP_STATUS.OK);
+    expect(Array.isArray(jsonGetPreview.previewLessons)).toBe(true);
+    expect(typeof jsonGetPreview.totalLessons).toBe('number');
+    expect(jsonGetPreview.previewLessons.length).toBeLessThan(
+      jsonGetPreview.totalLessons,
     );
 
-    jsonPreview.previewLessons.forEach((lesson: LessonModel) => {
+    jsonGetPreview.previewLessons.forEach((lesson: LessonModel) => {
       expect(typeof lesson.id).toBe('number');
       expect(typeof lesson.title).toBe('string');
       expect(typeof lesson.type).toBe('string');
@@ -45,25 +45,22 @@ test.describe('REQ-017 Free Demo Preview', () => {
     const { authHeader, userId } = loggedUser;
     lessonApi = new LessonApi(request, authHeader);
     courseApi = new CourseApi(request, authHeader);
-    const { responsePreview, jsonPreview } =
+    const { resGetPreview, jsonGetPreview } =
       await lessonApi.getPreview(courseId);
 
-    const previewCount = jsonPreview.previewLessons.length;
-    const totalLessons = jsonPreview.totalLessons;
+    const previewCount = jsonGetPreview.previewLessons.length;
+    const totalLessons = jsonGetPreview.totalLessons;
 
-    const { resEnroll, jsonEnroll } = await courseApi.enrollCourse(
-      courseId,
-      userId,
-    );
-    const { responseLessons, jsonLessons } =
+    const { resEnroll, jsonEnroll } = await courseApi.enroll(courseId, userId);
+    const { resGetLessons, jsonGetLessons } =
       await lessonApi.getLessons(courseId);
 
-    expect(responsePreview.status()).toBe(HTTP_STATUS.OK);
+    expect(resGetPreview.status()).toBe(HTTP_STATUS.OK);
     expect(resEnroll.status()).toBe(HTTP_STATUS.OK);
-    expect(responseLessons.status()).toBe(HTTP_STATUS.OK);
+    expect(resGetLessons.status()).toBe(HTTP_STATUS.OK);
     expect(jsonEnroll.enrollment.completed).toBe(false);
-    expect(jsonLessons.length).toEqual(totalLessons);
-    expect(jsonLessons.length).toBeGreaterThan(previewCount);
+    expect(jsonGetLessons.length).toEqual(totalLessons);
+    expect(jsonGetLessons.length).toBeGreaterThan(previewCount);
   });
 
   test('REQ-017 should return full lesson content for enrolled user @logged', async ({
@@ -74,20 +71,20 @@ test.describe('REQ-017 Free Demo Preview', () => {
     lessonApi = new LessonApi(request, authHeader);
     courseApi = new CourseApi(request, authHeader);
 
-    const { resEnroll } = await courseApi.enrollCourse(courseId, userId);
-    const { responseLessons, jsonLessons } =
+    const { resEnroll } = await courseApi.enroll(courseId, userId);
+    const { resGetLessons, jsonGetLessons } =
       await lessonApi.getLessons(courseId);
-    const lessonId = jsonLessons[0].id;
-    const { responseContent, jsonContent } = await lessonApi.getContent(
+    const lessonId = jsonGetLessons[0].id;
+    const { resGetContent, jsonGetContent } = await lessonApi.getContent(
       courseId,
       lessonId,
     );
 
     expect(resEnroll.status()).toBe(HTTP_STATUS.OK);
-    expect(responseLessons.status()).toBe(HTTP_STATUS.OK);
-    expect(responseContent.status()).toBe(HTTP_STATUS.OK);
-    expect(jsonContent.content).toBeDefined();
-    expect(typeof jsonContent.content).toBe('object');
+    expect(resGetLessons.status()).toBe(HTTP_STATUS.OK);
+    expect(resGetContent.status()).toBe(HTTP_STATUS.OK);
+    expect(jsonGetContent.content).toBeDefined();
+    expect(typeof jsonGetContent.content).toBe('object');
   });
 
   test('REQ-017 should deny full lesson content without authentication', async ({
@@ -96,16 +93,16 @@ test.describe('REQ-017 Free Demo Preview', () => {
     lessonApi = new LessonApi(request);
     courseApi = new CourseApi(request);
 
-    const { responsePreview, jsonPreview } =
+    const { resGetPreview, jsonGetPreview } =
       await lessonApi.getPreview(courseId);
-    const previewLessonId = jsonPreview.previewLessons[0].id;
-    const { responseContent, jsonContent } = await lessonApi.getContent(
+    const previewLessonId = jsonGetPreview.previewLessons[0].id;
+    const { resGetContent, jsonGetContent } = await lessonApi.getContent(
       courseId,
       previewLessonId,
     );
 
-    expect(responsePreview.status()).toBe(HTTP_STATUS.OK);
-    expect(responseContent.status()).toBe(HTTP_STATUS.BAD_REQUEST);
-    expect(jsonContent.error.message).toBeTruthy();
+    expect(resGetPreview.status()).toBe(HTTP_STATUS.OK);
+    expect(resGetContent.status()).toBe(HTTP_STATUS.BAD_REQUEST);
+    expect(jsonGetContent.error.message).toBeTruthy();
   });
 });

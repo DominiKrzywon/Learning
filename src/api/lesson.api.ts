@@ -10,54 +10,54 @@ export class LessonApi {
 
   async getLessons(
     courseId: number,
-  ): Promise<{ responseLessons: APIResponse; jsonLessons: any }> {
-    const responseLessons = await this.request.get(
+  ): Promise<{ resGetLessons: APIResponse; jsonGetLessons: any }> {
+    const resGetLessons = await this.request.get(
       apiUrls.courseLessonsUrl(courseId),
       { headers: { Authorization: this.authHeader! } },
     );
-    const jsonLessons = await responseLessons.json();
+    const jsonGetLessons = await resGetLessons.json();
 
-    return { responseLessons, jsonLessons };
+    return { resGetLessons, jsonGetLessons };
   }
 
   async getTitles(courseId: number): Promise<{
-    responseTitles: APIResponse;
-    jsonTitles: { id: number; title: string }[];
+    resGetTitles: APIResponse;
+    jsonGetTitles: { id: number; title: string }[];
   }> {
-    const responseTitles = await this.request.get(
+    const resGetTitles = await this.request.get(
       apiUrls.courseLessonsTitlesUrl(courseId),
     );
-    const jsonTitles = await responseTitles.json();
+    const jsonGetTitles = await resGetTitles.json();
 
-    return { responseTitles, jsonTitles };
+    return { resGetTitles, jsonGetTitles };
   }
 
   async getPreview(courseId: number): Promise<{
-    responsePreview: APIResponse;
-    jsonPreview: { previewLessons: LessonModel[]; totalLessons: number };
+    resGetPreview: APIResponse;
+    jsonGetPreview: { previewLessons: LessonModel[]; totalLessons: number };
   }> {
-    const responsePreview = await this.request.get(
+    const resGetPreview = await this.request.get(
       apiUrls.courseLessonsPreviewUrl(courseId),
     );
-    const jsonPreview = await responsePreview.json();
+    const jsonGetPreview = await resGetPreview.json();
 
-    return { responsePreview, jsonPreview };
+    return { resGetPreview, jsonGetPreview };
   }
 
   async getContent(
     courseId: number,
     lessonId: number,
   ): Promise<{
-    responseContent: APIResponse;
-    jsonContent: any;
+    resGetContent: APIResponse;
+    jsonGetContent: any;
   }> {
-    const responseContent = await this.request.get(
+    const resGetContent = await this.request.get(
       apiUrls.lessonContentUrl(courseId, lessonId),
       { headers: { Authorization: this.authHeader! } },
     );
-    const jsonContent = await responseContent.json();
+    const jsonGetContent = await resGetContent.json();
 
-    return { responseContent, jsonContent };
+    return { resGetContent, jsonGetContent };
   }
 
   async complete(
@@ -65,15 +65,15 @@ export class LessonApi {
     lessonId: number,
     userId: number,
   ): Promise<{
-    responseComplete: APIResponse;
+    resComplete: APIResponse;
     jsonComplete: { success: boolean };
   }> {
-    const responseComplete = await this.request.post(
+    const resComplete = await this.request.post(
       apiUrls.lessonCompleteUrl(courseId, lessonId),
       { data: { userId }, headers: { Authorization: this.authHeader! } },
     );
-    const jsonComplete = await responseComplete.json();
+    const jsonComplete = await resComplete.json();
 
-    return { responseComplete, jsonComplete };
+    return { resComplete, jsonComplete };
   }
 }

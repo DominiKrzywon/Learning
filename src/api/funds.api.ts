@@ -13,13 +13,16 @@ export class FundsApi {
 
   async getFunds(
     userId: number,
-  ): Promise<{ resFunds: APIResponse; jsonFunds: GetFundsResponse }> {
-    const resFunds = await this.request.get(apiUrls.getUserFundsUrl(userId), {
-      headers: { Authorization: this.authHeader! },
-    });
-    const jsonFunds = await resFunds.json();
+  ): Promise<{ resGetFunds: APIResponse; jsonGetFunds: GetFundsResponse }> {
+    const resGetFunds = await this.request.get(
+      apiUrls.getUserFundsUrl(userId),
+      {
+        headers: { Authorization: this.authHeader! },
+      },
+    );
+    const jsonGetFunds = await resGetFunds.json();
 
-    return { resFunds, jsonFunds };
+    return { resGetFunds, jsonGetFunds };
   }
 
   async updateFunds(
@@ -40,17 +43,17 @@ export class FundsApi {
     return { resUpdateFunds, jsonUpdateFunds };
   }
 
-  async getFundsHistory(userId: number): Promise<{
-    resFundsHistory: APIResponse;
-    jsonFundsHistory: GetFundsHistoryResponse;
+  async getHistory(userId: number): Promise<{
+    resGetHistory: APIResponse;
+    jsonGetHistory: GetFundsHistoryResponse;
   }> {
-    const resFundsHistory = await this.request.get(
+    const resGetHistory = await this.request.get(
       apiUrls.getUserFundsHistoryUrl(userId),
       {
         headers: { Authorization: this.authHeader! },
       },
     );
-    const jsonFundsHistory = await resFundsHistory.json();
-    return { resFundsHistory, jsonFundsHistory };
+    const jsonGetHistory = await resGetHistory.json();
+    return { resGetHistory, jsonGetHistory };
   }
 }

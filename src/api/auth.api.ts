@@ -25,9 +25,15 @@ export class AuthApi {
     return { resRegister, jsonRegister };
   }
 
-  async getStatus(authHeader: string) {
-    return this.request.get(apiUrls.authStatusUrl, {
+  async getAuthStatus(authHeader: string): Promise<{
+    resAuthStatus: APIResponse;
+    jsonAuthStatus: any;
+  }> {
+    const resAuthStatus = await this.request.get(apiUrls.authStatusUrl, {
       headers: { Authorization: authHeader },
     });
+    const jsonAuthStatus = await resAuthStatus.json();
+
+    return { resAuthStatus, jsonAuthStatus };
   }
 }

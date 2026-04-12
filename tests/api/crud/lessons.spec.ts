@@ -24,11 +24,11 @@ test.describe('Lessons API', () => {
     const { authHeader } = loggedUser;
     const lessonApi = new LessonApi(request, authHeader);
 
-    const { responseLessons, jsonLessons } =
+    const { resGetLessons, jsonGetLessons } =
       await lessonApi.getLessons(courseId);
 
-    expect(responseLessons.status()).toBe(HTTP_STATUS.FORBIDDEN);
-    expect(jsonLessons.error.message).toBe(
+    expect(resGetLessons.status()).toBe(HTTP_STATUS.FORBIDDEN);
+    expect(jsonGetLessons.error.message).toBe(
       'Not authorized to access this course',
     );
   });
@@ -41,16 +41,16 @@ test.describe('Lessons API', () => {
     const courseApi = new CourseApi(request, authHeader);
     const lessonApi = new LessonApi(request, authHeader);
 
-    await courseApi.enrollCourse(courseId, userId);
+    await courseApi.enroll(courseId, userId);
 
-    const { responseLessons, jsonLessons } =
+    const { resGetLessons, jsonGetLessons } =
       await lessonApi.getLessons(courseId);
 
-    expect(responseLessons.status()).toBe(HTTP_STATUS.OK);
-    expect(Array.isArray(jsonLessons)).toBe(true);
-    expect(jsonLessons.length).toBeGreaterThan(1);
+    expect(resGetLessons.status()).toBe(HTTP_STATUS.OK);
+    expect(Array.isArray(jsonGetLessons)).toBe(true);
+    expect(jsonGetLessons.length).toBeGreaterThan(1);
 
-    jsonLessons.forEach((lesson: LessonModel) => {
+    jsonGetLessons.forEach((lesson: LessonModel) => {
       expect(lesson.id).toBeGreaterThanOrEqual(1);
       expect(typeof lesson.title).toBe('string');
       expect(typeof lesson.completed).toBe('boolean');
@@ -80,11 +80,11 @@ test.describe('Lessons API', () => {
 
   test('should return lesson titles', async ({ request }) => {
     const lessonApi = new LessonApi(request);
-    const { responseTitles, jsonTitles } = await lessonApi.getTitles(courseId);
+    const { resGetTitles, jsonGetTitles } = await lessonApi.getTitles(courseId);
 
-    expect(responseTitles.status()).toBe(HTTP_STATUS.OK);
-    expect(Array.isArray(jsonTitles)).toBe(true);
-    jsonTitles.forEach((title: { id: number; title: string }) => {
+    expect(resGetTitles.status()).toBe(HTTP_STATUS.OK);
+    expect(Array.isArray(jsonGetTitles)).toBe(true);
+    jsonGetTitles.forEach((title: { id: number; title: string }) => {
       expect(typeof title.id).toBe('number');
       expect(typeof title.title).toBe('string');
     });
@@ -92,15 +92,15 @@ test.describe('Lessons API', () => {
 
   test('should return preview lessons', async ({ request }) => {
     const lessonApi = new LessonApi(request);
-    const { responsePreview, jsonPreview } =
+    const { resGetPreview, jsonGetPreview } =
       await lessonApi.getPreview(courseId);
 
-    expect(responsePreview.status()).toBe(HTTP_STATUS.OK);
-    expect(Array.isArray(jsonPreview.previewLessons)).toBe(true);
-    expect(jsonPreview.previewLessons.length).toBeGreaterThan(1);
-    expect(typeof jsonPreview.totalLessons).toBe('number');
-    expect(jsonPreview.previewLessons.length).toBeLessThanOrEqual(
-      jsonPreview.totalLessons,
+    expect(resGetPreview.status()).toBe(HTTP_STATUS.OK);
+    expect(Array.isArray(jsonGetPreview.previewLessons)).toBe(true);
+    expect(jsonGetPreview.previewLessons.length).toBeGreaterThan(1);
+    expect(typeof jsonGetPreview.totalLessons).toBe('number');
+    expect(jsonGetPreview.previewLessons.length).toBeLessThanOrEqual(
+      jsonGetPreview.totalLessons,
     );
   });
 
@@ -112,20 +112,20 @@ test.describe('Lessons API', () => {
     const courseApi = new CourseApi(request, authHeader);
     const lessonApi = new LessonApi(request, authHeader);
 
-    await courseApi.enrollCourse(courseId, userId);
-    const { responseLessons, jsonLessons } =
+    await courseApi.enroll(courseId, userId);
+    const { resGetLessons, jsonGetLessons } =
       await lessonApi.getLessons(courseId);
 
-    const lessonId = jsonLessons[0].id;
-    const { responseContent, jsonContent } = await lessonApi.getContent(
+    const lessonId = jsonGetLessons[0].id;
+    const { resGetContent, jsonGetContent } = await lessonApi.getContent(
       courseId,
       lessonId,
     );
 
-    expect(responseLessons.status()).toBe(HTTP_STATUS.OK);
-    expect(responseContent.status()).toBe(HTTP_STATUS.OK);
-    expect(typeof jsonContent.content.videoUrl).toBe('string');
-    expect(typeof jsonContent.content.transcript).toBe('string');
+    expect(resGetLessons.status()).toBe(HTTP_STATUS.OK);
+    expect(resGetContent.status()).toBe(HTTP_STATUS.OK);
+    expect(typeof jsonGetContent.content.videoUrl).toBe('string');
+    expect(typeof jsonGetContent.content.transcript).toBe('string');
   });
 
   test('should mark lesson as completed for authorized user', async ({
@@ -136,19 +136,19 @@ test.describe('Lessons API', () => {
     const courseApi = new CourseApi(request, authHeader);
     const lessonApi = new LessonApi(request, authHeader);
 
-    await courseApi.enrollCourse(courseId, userId);
-    const { responseLessons, jsonLessons } =
+    await courseApi.enroll(courseId, userId);
+    const { resGetLessons, jsonGetLessons } =
       await lessonApi.getLessons(courseId);
 
-    const lessonId = jsonLessons[0].id;
-    const { responseComplete, jsonComplete } = await lessonApi.complete(
+    const lessonId = jsonGetLessons[0].id;
+    const { resComplete, jsonComplete } = await lessonApi.complete(
       courseId,
       lessonId,
       userId,
     );
 
-    expect(responseLessons.status()).toBe(HTTP_STATUS.OK);
-    expect(responseComplete.status()).toBe(HTTP_STATUS.OK);
+    expect(resGetLessons.status()).toBe(HTTP_STATUS.OK);
+    expect(resComplete.status()).toBe(HTTP_STATUS.OK);
     expect(jsonComplete.success).toBe(true);
   });
 });

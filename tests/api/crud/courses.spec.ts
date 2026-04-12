@@ -20,12 +20,12 @@ test.describe('Courses API', () => {
   });
 
   test('should display all courses @logged', async ({ request }) => {
-    const { responseAll, jsonAll } = await courseApi.getAll();
-    const firstCourse = jsonAll[0];
+    const { resGetAll, jsonGetAll } = await courseApi.getAll();
+    const firstCourse = jsonGetAll[0];
 
-    expect(responseAll.status()).toBe(HTTP_STATUS.OK);
-    expect(Array.isArray(jsonAll)).toBe(true);
-    expect(jsonAll.length).toBeGreaterThan(0);
+    expect(resGetAll.status()).toBe(HTTP_STATUS.OK);
+    expect(Array.isArray(jsonGetAll)).toBe(true);
+    expect(jsonGetAll.length).toBeGreaterThan(0);
     expect(firstCourse.id).toBeTruthy();
     expect(['Beginner', 'Intermediate', 'Advanced']).toContain(
       firstCourse.level,
@@ -34,10 +34,10 @@ test.describe('Courses API', () => {
 
   test('should return course details by ID', async ({ request }) => {
     const courseId = courseData.fourthCourseId;
-    const { responseById, jsonById } = await courseApi.getById(courseId);
+    const { resGetById, jsonGetById } = await courseApi.getById(courseId);
 
-    expect(responseById.status()).toBe(HTTP_STATUS.OK);
-    expect(jsonById).toMatchObject({
+    expect(resGetById.status()).toBe(HTTP_STATUS.OK);
+    expect(jsonGetById).toMatchObject({
       id: 4,
       title: 'Playwright Automation Testing',
       description:
@@ -60,27 +60,28 @@ test.describe('Courses API', () => {
       totalHours: 2.2,
       duration: '2.2 hour(s)',
     });
-    expect(typeof jsonById.students).toBe('number');
-    expect(typeof jsonById.rating).toBe('number');
+    expect(typeof jsonGetById.students).toBe('number');
+    expect(typeof jsonGetById.rating).toBe('number');
   });
 
   test('should not display a non-existing course', async ({ request }) => {
     const courseId = courseData.nonExistingCourseId;
-    const { responseById } = await courseApi.getById(courseId);
-    const responseBody = await responseById.text();
+    const { resGetById } = await courseApi.getById(courseId);
+    const responseBody = await resGetById.text();
     const responseJson = JSON.parse(responseBody);
 
-    expect(responseById.status()).toBe(HTTP_STATUS.NOT_FOUND);
+    expect(resGetById.status()).toBe(HTTP_STATUS.NOT_FOUND);
     expect(responseJson.error.message).toBe('Course not found');
   });
 
   test('should display course ratings @logged', async () => {
     const courseId = courseData.secondCourseId;
-    const { responseRating, jsonRating } = await courseApi.getRatings(courseId);
+    const { resGetRatings, jsonGetRatings } =
+      await courseApi.getRatings(courseId);
 
-    expect(responseRating.status()).toBe(HTTP_STATUS.OK);
-    expect(Array.isArray(jsonRating)).toBe(true);
-    jsonRating.forEach((rating: CourseRatingModel) => {
+    expect(resGetRatings.status()).toBe(HTTP_STATUS.OK);
+    expect(Array.isArray(jsonGetRatings)).toBe(true);
+    jsonGetRatings.forEach((rating: CourseRatingModel) => {
       expect(rating.rating).toBeGreaterThanOrEqual(0);
       expect(rating.rating).toBeLessThanOrEqual(5);
       expect(typeof rating.comment).toBe('string');
@@ -95,29 +96,29 @@ test.describe('Courses API', () => {
   }) => {
     const zeroAmount = 0;
     const courseApi = new CourseApi(request, loggedUser.authHeader);
-    const { resEnroll, jsonEnroll } = await courseApi.enrollCourse(
+    const { resEnroll, jsonEnroll } = await courseApi.enroll(
       courseId,
       loggedUser.userId,
     );
-    const { responseProgress, jsonProgress } =
+    const { resGetProgress, jsonGetProgress } =
       await courseApi.getProgress(courseId);
 
     expect(jsonEnroll.success).toBe(true);
     expect(jsonEnroll.enrollment.progress).toEqual(0);
-    expect(responseProgress.status()).toBe(HTTP_STATUS.OK);
+    expect(resGetProgress.status()).toBe(HTTP_STATUS.OK);
     expect(resEnroll.status()).toBe(HTTP_STATUS.OK);
-    expect(Array.isArray(jsonProgress)).toBe(true);
-    expect(jsonProgress.length).toBe(zeroAmount);
+    expect(Array.isArray(jsonGetProgress)).toBe(true);
+    expect(jsonGetProgress.length).toBe(zeroAmount);
   });
 
   test('should not display progress for unauthorized user @logged', async () => {
     const { resLogin, jsonLogin } = await authApi.login(testUser1);
-    const { responseProgress } = await courseApi.getProgress(courseId);
+    const { resGetProgress } = await courseApi.getProgress(courseId);
 
     expect(jsonLogin.success).toBe(true);
     expect(resLogin.status()).toBe(HTTP_STATUS.OK);
-    expect(responseProgress).toBeDefined();
-    expect(responseProgress.status()).toBe(HTTP_STATUS.FORBIDDEN);
+    expect(resGetProgress).toBeDefined();
+    expect(resGetProgress.status()).toBe(HTTP_STATUS.FORBIDDEN);
   });
 
   test('should not display rate when user is not at this course @logged', async ({
@@ -126,13 +127,13 @@ test.describe('Courses API', () => {
   }) => {
     const courseApiWithAuth = new CourseApi(request, loggedUser.authHeader);
     const payload = { rating: 4, comment: 'test' };
-    const { responseRate, jsonRate } = await courseApiWithAuth.rate(
+    const { resRate, jsonRate } = await courseApiWithAuth.rate(
       courseId,
       payload,
     );
     const expectedErrorMessage = 'User not authorized';
 
-    expect(responseRate.status()).toBe(HTTP_STATUS.FORBIDDEN);
+    expect(resRate.status()).toBe(HTTP_STATUS.FORBIDDEN);
     expect(jsonRate.error.message).toBe(expectedErrorMessage);
   });
 });

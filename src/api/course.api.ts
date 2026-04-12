@@ -8,49 +8,44 @@ export class CourseApi {
     private authHeader?: string,
   ) {}
 
-  async getAll(): Promise<{ responseAll: APIResponse; jsonAll: any }> {
-    const responseAll = await this.request.get(apiUrls.coursesUrl);
-    const jsonAll = await responseAll.json();
-    return { responseAll, jsonAll };
+  async getAll(): Promise<{ resGetAll: APIResponse; jsonGetAll: any }> {
+    const resGetAll = await this.request.get(apiUrls.coursesUrl);
+    const jsonGetAll = await resGetAll.json();
+    return { resGetAll, jsonGetAll };
   }
 
   async getById(
     courseId: number,
-  ): Promise<{ responseById: APIResponse; jsonById: any }> {
-    const responseById = await this.request.get(
-      apiUrls.courseByIdUrl(courseId),
-    );
-    const jsonById = await responseById.json();
-    return { responseById, jsonById };
+  ): Promise<{ resGetById: APIResponse; jsonGetById: any }> {
+    const resGetById = await this.request.get(apiUrls.courseByIdUrl(courseId));
+    const jsonGetById = await resGetById.json();
+    return { resGetById, jsonGetById };
   }
 
   async getRatings(
     courseId: number,
-  ): Promise<{ responseRating: APIResponse; jsonRating: any }> {
-    const responseRating = await this.request.get(
+  ): Promise<{ resGetRatings: APIResponse; jsonGetRatings: any }> {
+    const resGetRatings = await this.request.get(
       apiUrls.courseRatingsUrl(courseId),
     );
-    const jsonRating = await responseRating.json();
-    return { responseRating, jsonRating };
+    const jsonGetRatings = await resGetRatings.json();
+    return { resGetRatings, jsonGetRatings };
   }
 
   async rate(
     courseId: number,
     payload: CreateRatingPayload,
-  ): Promise<{ responseRate: APIResponse; jsonRate: any }> {
-    const responseRate = await this.request.post(
-      apiUrls.courseRateUrl(courseId),
-      {
-        data: payload,
-        headers: { Authorization: this.authHeader! },
-      },
-    );
-    const jsonRate = await responseRate.json();
+  ): Promise<{ resRate: APIResponse; jsonRate: any }> {
+    const resRate = await this.request.post(apiUrls.courseRateUrl(courseId), {
+      data: payload,
+      headers: { Authorization: this.authHeader! },
+    });
+    const jsonRate = await resRate.json();
 
-    return { responseRate, jsonRate };
+    return { resRate, jsonRate };
   }
 
-  async enrollCourse(
+  async enroll(
     courseId: number,
     userId: number,
   ): Promise<{ resEnroll: APIResponse; jsonEnroll: any }> {
@@ -67,13 +62,13 @@ export class CourseApi {
 
   async getProgress(
     courseId: number,
-  ): Promise<{ responseProgress: APIResponse; jsonProgress: any }> {
-    const responseProgress = await this.request.get(
+  ): Promise<{ resGetProgress: APIResponse; jsonGetProgress: any }> {
+    const resGetProgress = await this.request.get(
       apiUrls.courseProgressUrl(courseId),
       { headers: { Authorization: this.authHeader! } },
     );
-    const jsonProgress = await responseProgress.json();
+    const jsonGetProgress = await resGetProgress.json();
 
-    return { responseProgress, jsonProgress };
+    return { resGetProgress, jsonGetProgress };
   }
 }
