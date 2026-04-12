@@ -76,6 +76,7 @@ test.describe('REQ-019 Public User Profile', () => {
     request,
     loggedUser,
   }) => {
+    const expectedErrorMessage = 'Profile not found or is private';
     const { authHeader, userId } = loggedUser;
     userApi = new UserApi(request, authHeader);
 
@@ -83,8 +84,6 @@ test.describe('REQ-019 Public User Profile', () => {
       await userApi.getPublicProfile(userId);
 
     expect(resGetPublicProfile.status()).toBe(HTTP_STATUS.NOT_FOUND);
-    expect(jsonGetPublicProfile.error.message).toBe(
-      'Profile not found or is private',
-    );
+    expect(jsonGetPublicProfile.error.message).toBe(expectedErrorMessage);
   });
 });

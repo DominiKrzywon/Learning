@@ -105,7 +105,7 @@ test.describe('Courses API', () => {
       await courseApi.getProgress(courseId);
 
     expectSuccess(jsonEnroll);
-    expect(jsonEnroll.enrollment.progress).toEqual(0);
+    expect(jsonEnroll.enrollment.progress).toEqual(zeroAmount);
     expectStatusOK(resGetProgress);
     expectStatusOK(resEnroll);
     expect(Array.isArray(jsonGetProgress)).toBe(true);

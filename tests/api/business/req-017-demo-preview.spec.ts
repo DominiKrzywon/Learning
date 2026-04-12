@@ -4,7 +4,11 @@ import { expect, test } from '@_src/fixtures/user.fixture';
 import { restoreSystem } from '@_src/helper/restore';
 import { LessonModel } from '@_src/models/lessons.model';
 import { courseData } from '@_src/test-data/course.data';
-import { expectStatusOK, expectSuccess } from '@_src/utils/assertions';
+import {
+  expectErrorAssert,
+  expectStatusOK,
+  expectSuccess,
+} from '@_src/utils/assertions';
 import { HTTP_STATUS } from '@_src/utils/http-status';
 
 let lessonApi: LessonApi;
@@ -104,6 +108,6 @@ test.describe('REQ-017 Free Demo Preview', () => {
 
     expectStatusOK(resGetPreview);
     expect(resGetContent.status()).toBe(HTTP_STATUS.BAD_REQUEST);
-    expect(jsonGetContent.error.message).toBeTruthy();
+    expectErrorAssert(jsonGetContent);
   });
 });

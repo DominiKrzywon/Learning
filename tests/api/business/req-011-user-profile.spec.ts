@@ -6,7 +6,11 @@ import {
   invalid_password,
   userProfileData,
 } from '@_src/test-data/user.profile.data';
-import { expectStatusOK, expectSuccess } from '@_src/utils/assertions';
+import {
+  expectErrorAssert,
+  expectStatusOK,
+  expectSuccess,
+} from '@_src/utils/assertions';
 import { HTTP_STATUS } from '@_src/utils/http-status';
 import { faker } from '@faker-js/faker';
 
@@ -35,14 +39,14 @@ test.describe('REQ-011 User Profile Management', () => {
       userId,
       updatePayload,
     );
-    const relogin = await authApi.login({ username, password });
-    const loginJson = relogin.jsonLogin;
-    const newAuthHeader = `Bearer ${loginJson.access_token}`;
+    const { resLogin, jsonLogin } = await authApi.login({ username, password });
+    const newAuthHeader = `Bearer ${jsonLogin.access_token}`;
 
     const newUserApi = new UserApi(request, newAuthHeader);
     const { resGetProfile, jsonGetProfile } =
       await newUserApi.getProfile(userId);
 
+    expectStatusOK(resLogin);
     expectStatusOK(resUpdateProfile);
     expectStatusOK(resGetProfile);
     expectSuccess(jsonUpdateProfile);
@@ -83,7 +87,7 @@ test.describe('REQ-011 User Profile Management', () => {
     expectStatusOK(resLogin);
     expect(jsonLogin.access_token).toBeTruthy();
     expect(resLoginOld.status()).toBe(HTTP_STATUS.UNAUTHORIZED);
-    expect(jsonLoginOld.error.message).toBe(expectedErrorMessage);
+    expectErrorAssert(jsonLoginOld);
   });
 
   test('REQ-011 should reject password change when current password is invalid @logged', async ({
@@ -102,7 +106,7 @@ test.describe('REQ-011 User Profile Management', () => {
       await userApi.changePassword(userId, badPassword);
 
     expect(resChangePassword.status()).toBe(HTTP_STATUS.UNAUTHORIZED);
-    expect(jsonChangePassword.error).toBeTruthy();
+    expectErrorAssert(jsonChangePassword);
   });
 
   test('REQ-011 should block login and profile access after account deactivation @logged', async ({

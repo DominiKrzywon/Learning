@@ -65,6 +65,7 @@ test.describe('REQ-007 Funds', () => {
     request,
     loggedUser,
   }) => {
+    const expectedZeroCount = 0;
     const expectedErrorMessage = 'Invalid amount';
     const { authHeader, userId } = loggedUser;
     fundsApi = new FundsApi(request, authHeader);
@@ -105,7 +106,7 @@ test.describe('REQ-007 Funds', () => {
 
       expectStatusOK(resGetHistory);
       expect(Array.isArray(jsonGetHistory.history)).toBe(true);
-      expect(jsonGetHistory.history.length).toEqual(0);
+      expect(jsonGetHistory.history.length).toEqual(expectedZeroCount);
     });
   });
 });

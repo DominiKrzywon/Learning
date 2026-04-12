@@ -7,6 +7,7 @@ export const expectStatusOK = (response: APIResponse) => {
 export const expectSuccess = (json: { success?: boolean }) => {
   expect(json.success).toBe(true);
 };
-export const errorAssert = (json: any) => {
+
+export const expectErrorAssert = (json: any) => {
   expect(json.error?.message).toBeTruthy();
 };

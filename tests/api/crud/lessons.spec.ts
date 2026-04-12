@@ -22,6 +22,7 @@ test.describe('Lessons API', () => {
     request,
     loggedUser,
   }) => {
+    const expectedErrorMessage = 'Not authorized to access this course';
     const { authHeader } = loggedUser;
     const lessonApi = new LessonApi(request, authHeader);
 
@@ -29,15 +30,15 @@ test.describe('Lessons API', () => {
       await lessonApi.getLessons(courseId);
 
     expect(resGetLessons.status()).toBe(HTTP_STATUS.FORBIDDEN);
-    expect(jsonGetLessons.error.message).toBe(
-      'Not authorized to access this course',
-    );
+    expect(jsonGetLessons.error.message).toBe(expectedErrorMessage);
   });
 
   test('should get lessons with authorize user', async ({
     request,
     loggedUser,
   }) => {
+    const expectedLengthNumber = 1;
+    const expectedZeroNumber = 0;
     const { authHeader, userId } = loggedUser;
     const courseApi = new CourseApi(request, authHeader);
     const lessonApi = new LessonApi(request, authHeader);
@@ -49,10 +50,10 @@ test.describe('Lessons API', () => {
 
     expectStatusOK(resGetLessons);
     expect(Array.isArray(jsonGetLessons)).toBe(true);
-    expect(jsonGetLessons.length).toBeGreaterThan(1);
+    expect(jsonGetLessons.length).toBeGreaterThan(expectedZeroNumber);
 
     jsonGetLessons.forEach((lesson: LessonModel) => {
-      expect(lesson.id).toBeGreaterThanOrEqual(1);
+      expect(lesson.id).toBeGreaterThanOrEqual(expectedLengthNumber);
       expect(typeof lesson.title).toBe('string');
       expect(typeof lesson.completed).toBe('boolean');
 
@@ -72,9 +73,15 @@ test.describe('Lessons API', () => {
       if (lesson.type === 'quiz') {
         const quizContent = lesson.content as QuizContent;
         expect(Array.isArray(quizContent.questions)).toBe(true);
-        expect(quizContent.questions[0]).toHaveProperty('question');
-        expect(quizContent.questions[0]).toHaveProperty('options');
-        expect(typeof quizContent.questions[0].correct).toBe('number');
+        expect(quizContent.questions[expectedZeroNumber]).toHaveProperty(
+          'question',
+        );
+        expect(quizContent.questions[expectedZeroNumber]).toHaveProperty(
+          'options',
+        );
+        expect(typeof quizContent.questions[expectedZeroNumber].correct).toBe(
+          'number',
+        );
       }
     });
   });
@@ -92,13 +99,16 @@ test.describe('Lessons API', () => {
   });
 
   test('should return preview lessons', async ({ request }) => {
+    const expectedLengthNumber = 1;
     const lessonApi = new LessonApi(request);
     const { resGetPreview, jsonGetPreview } =
       await lessonApi.getPreview(courseId);
 
     expectStatusOK(resGetPreview);
     expect(Array.isArray(jsonGetPreview.previewLessons)).toBe(true);
-    expect(jsonGetPreview.previewLessons.length).toBeGreaterThan(1);
+    expect(jsonGetPreview.previewLessons.length).toBeGreaterThan(
+      expectedLengthNumber,
+    );
     expect(typeof jsonGetPreview.totalLessons).toBe('number');
     expect(jsonGetPreview.previewLessons.length).toBeLessThanOrEqual(
       jsonGetPreview.totalLessons,
@@ -109,6 +119,7 @@ test.describe('Lessons API', () => {
     request,
     loggedUser,
   }) => {
+    const expectedZeroNumber = 0;
     const { authHeader, userId } = loggedUser;
     const courseApi = new CourseApi(request, authHeader);
     const lessonApi = new LessonApi(request, authHeader);
@@ -117,7 +128,7 @@ test.describe('Lessons API', () => {
     const { resGetLessons, jsonGetLessons } =
       await lessonApi.getLessons(courseId);
 
-    const lessonId = jsonGetLessons[0].id;
+    const lessonId = jsonGetLessons[expectedZeroNumber].id;
     const { resGetContent, jsonGetContent } = await lessonApi.getContent(
       courseId,
       lessonId,
@@ -133,6 +144,7 @@ test.describe('Lessons API', () => {
     request,
     loggedUser,
   }) => {
+    const expectedZeroNumber = 0;
     const { authHeader, userId } = loggedUser;
     const courseApi = new CourseApi(request, authHeader);
     const lessonApi = new LessonApi(request, authHeader);
@@ -141,7 +153,7 @@ test.describe('Lessons API', () => {
     const { resGetLessons, jsonGetLessons } =
       await lessonApi.getLessons(courseId);
 
-    const lessonId = jsonGetLessons[0].id;
+    const lessonId = jsonGetLessons[expectedZeroNumber].id;
     const { resComplete, jsonComplete } = await lessonApi.complete(
       courseId,
       lessonId,

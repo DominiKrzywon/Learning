@@ -22,6 +22,7 @@ test.describe('REQ-003 User Progress Monitor', () => {
     request,
     loggedUser,
   }) => {
+    const expectedEmptyProgressCount = 0;
     const { authHeader, userId } = loggedUser;
     lessonApi = new LessonApi(request, authHeader);
     courseApi = new CourseApi(request, authHeader);
@@ -29,7 +30,7 @@ test.describe('REQ-003 User Progress Monitor', () => {
     const { resEnroll } = await courseApi.enroll(courseId, userId);
     const { resGetLessons, jsonGetLessons } =
       await lessonApi.getLessons(courseId);
-    const lessonId = jsonGetLessons[0].id;
+    const lessonId = jsonGetLessons[expectedEmptyProgressCount].id;
 
     const {
       resGetProgress: beforeResGetProgress,
@@ -48,21 +49,28 @@ test.describe('REQ-003 User Progress Monitor', () => {
     } = await courseApi.getProgress(courseId);
 
     expectStatusOK(beforeResGetProgress);
-    expect(beforeJsonGetProgress.length).toBe(0);
+    expect(beforeJsonGetProgress.length).toBe(expectedEmptyProgressCount);
     expectStatusOK(resEnroll);
     expectStatusOK(resGetLessons);
     expectStatusOK(resComplete);
     expectStatusOK(afterResGetProgress);
-    expect(afterJsonGetProgress[0].completed).toBe(true);
-    expect(afterJsonGetProgress[0].lessonId).toBe(lessonId);
-    expect(afterJsonGetProgress[0].courseId).toBe(courseId);
-    expect(jsonComplete.success).toBe(true);
+    expect(afterJsonGetProgress[expectedEmptyProgressCount].completed).toBe(
+      true,
+    );
+    expect(afterJsonGetProgress[expectedEmptyProgressCount].lessonId).toBe(
+      lessonId,
+    );
+    expect(afterJsonGetProgress[expectedEmptyProgressCount].courseId).toBe(
+      courseId,
+    );
+    expectSuccess(jsonComplete);
   });
 
   test('REQ-003 should persist progress after relogin @logged', async ({
     request,
     loggedUser,
   }) => {
+    const expectedZeroCount = 0;
     const { authHeader, userId, username, password } = loggedUser;
     lessonApi = new LessonApi(request, authHeader);
     courseApi = new CourseApi(request, authHeader);
@@ -71,7 +79,7 @@ test.describe('REQ-003 User Progress Monitor', () => {
     const { resEnroll } = await courseApi.enroll(courseId, userId);
     const { resGetLessons, jsonGetLessons } =
       await lessonApi.getLessons(courseId);
-    const lessonId = jsonGetLessons[0].id;
+    const lessonId = jsonGetLessons[expectedZeroCount].id;
     const { resComplete, jsonComplete } = await lessonApi.complete(
       courseId,
       lessonId,
@@ -93,15 +101,16 @@ test.describe('REQ-003 User Progress Monitor', () => {
     expectStatusOK(afterResGetProgress);
     expect(resGetProgress).toBeDefined();
     expectSuccess(jsonComplete);
-    expect(jsonGetProgress[0].completed).toBe(true);
+    expect(jsonGetProgress[expectedZeroCount].completed).toBe(true);
     expectSuccess(jsonLogin);
-    expect(afterJsonGetProgress[0].completed).toBe(true);
+    expect(afterJsonGetProgress[expectedZeroCount].completed).toBe(true);
   });
 
   test('REQ-003 should reject lesson completion for non-enrolled course @logged', async ({
     request,
     loggedUser,
   }) => {
+    const expectedZeroCount = 0;
     const expectedErrorMessage = 'User not enrolled in this course';
     const { authHeader, userId } = loggedUser;
     lessonApi = new LessonApi(request, authHeader);
@@ -110,14 +119,14 @@ test.describe('REQ-003 User Progress Monitor', () => {
     const { resGetPreview, jsonGetPreview } =
       await lessonApi.getPreview(courseId);
     const { previewLessons } = jsonGetPreview;
-    const lessonId = previewLessons[0].id;
+    const lessonId = previewLessons[expectedZeroCount].id;
     await lessonApi.complete(courseId, lessonId, userId);
     const { resGetProgress, jsonGetProgress } =
       await courseApi.getProgress(courseId);
 
     expectStatusOK(resGetPreview);
     expect(Array.isArray(previewLessons)).toBe(true);
-    expect(previewLessons.length).toBeGreaterThan(0);
+    expect(previewLessons.length).toBeGreaterThan(expectedZeroCount);
     previewLessons.forEach((lesson: LessonModel) => {
       expect(typeof lesson.id).toBe('number');
       expect(typeof lesson.title).toBe('string');
