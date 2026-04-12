@@ -1,6 +1,7 @@
 import { UserApi } from '@_src/api/user.api';
 import { expect, test } from '@_src/fixtures/user.fixture';
 import { restoreSystem } from '@_src/helper/restore';
+import { publicProfileSchema } from '@_src/schemas/public-profile.schema';
 import { expectStatusOK } from '@_src/utils/assertions';
 import { HTTP_STATUS } from '@_src/utils/http-status';
 
@@ -30,18 +31,11 @@ test.describe('REQ-019 Public User Profile', () => {
     const { resGetPublicProfile, jsonGetPublicProfile } =
       await userApi.getPublicProfile(userId);
 
+    const validProfile = publicProfileSchema.parse(jsonGetPublicProfile);
+    expect(validProfile.id).toBe(userId);
+    expect(jsonUpdateProfile.message).toBe(successMessage);
     expectStatusOK(resUpdateProfile);
     expectStatusOK(resGetPublicProfile);
-    expect(jsonUpdateProfile.message).toBe(successMessage);
-    expect(typeof jsonGetPublicProfile.id).toBe('number');
-    expect(typeof jsonGetPublicProfile.firstName).toBe('string');
-    expect(typeof jsonGetPublicProfile.lastName).toBe('string');
-    expect(typeof jsonGetPublicProfile.avatar).toBe('string');
-    expect(typeof jsonGetPublicProfile.joinDate).toBe('string');
-    expect(typeof jsonGetPublicProfile.role).toBe('string');
-    expect(Array.isArray(jsonGetPublicProfile.enrollments)).toBe(true);
-    expect(Array.isArray(jsonGetPublicProfile.certificates)).toBe(true);
-    expect(Array.isArray(jsonGetPublicProfile.ratings)).toBe(true);
   });
 
   test('REQ-019 should not expose sensitive data in public profile @logged', async ({

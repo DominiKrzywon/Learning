@@ -3,13 +3,15 @@ import { LessonApi } from '@_src/api/lesson.api';
 import { expect, test } from '@_src/fixtures/user.fixture';
 import { restoreSystem } from '@_src/helper/restore';
 import {
-  LessonModel,
-  QuizContent,
-  ReadingContent,
-} from '@_src/models/lessons.model';
+  LessonContentResponseSchema,
+  LessonSchema,
+  LessonTitleSchema,
+  PreviewLessonsResponseSchema,
+} from '@_src/schemas/lessons.schema';
 import { courseData } from '@_src/test-data/course.data';
 import { expectStatusOK, expectSuccess } from '@_src/utils/assertions';
 import { HTTP_STATUS } from '@_src/utils/http-status';
+import z from 'zod';
 
 test.describe('Lessons API', () => {
   const courseId = courseData.defaultCourseId;
@@ -52,49 +54,28 @@ test.describe('Lessons API', () => {
     expect(Array.isArray(jsonGetLessons)).toBe(true);
     expect(jsonGetLessons.length).toBeGreaterThan(expectedZeroNumber);
 
-    jsonGetLessons.forEach((lesson: LessonModel) => {
+    const validLessons = z.array(LessonSchema).parse(jsonGetLessons);
+    validLessons.forEach((lesson) => {
       expect(lesson.id).toBeGreaterThanOrEqual(expectedLengthNumber);
-      expect(typeof lesson.title).toBe('string');
-      expect(typeof lesson.completed).toBe('boolean');
-
-      if (lesson.duration !== undefined) {
-        expect(typeof lesson.duration).toBe('string');
-      }
-
-      if (lesson.type === 'video') {
-        expect(lesson.content).toHaveProperty('videoUrl');
-        expect(lesson.content).toHaveProperty('transcript');
-      }
-      if (lesson.type === 'reading') {
-        const readingContent = lesson.content as ReadingContent;
-        expect(lesson.content).toHaveProperty('text');
-        expect(Array.isArray(readingContent.resources)).toBe(true);
-      }
-      if (lesson.type === 'quiz') {
-        const quizContent = lesson.content as QuizContent;
-        expect(Array.isArray(quizContent.questions)).toBe(true);
-        expect(quizContent.questions[expectedZeroNumber]).toHaveProperty(
-          'question',
-        );
-        expect(quizContent.questions[expectedZeroNumber]).toHaveProperty(
-          'options',
-        );
-        expect(typeof quizContent.questions[expectedZeroNumber].correct).toBe(
-          'number',
-        );
-      }
     });
   });
 
   test('should return lesson titles', async ({ request }) => {
+    const expectedZeroNumber = 0;
     const lessonApi = new LessonApi(request);
     const { resGetTitles, jsonGetTitles } = await lessonApi.getTitles(courseId);
 
     expectStatusOK(resGetTitles);
-    expect(Array.isArray(jsonGetTitles)).toBe(true);
-    jsonGetTitles.forEach((title: { id: number; title: string }) => {
-      expect(typeof title.id).toBe('number');
-      expect(typeof title.title).toBe('string');
+
+    const lessonTitles = z.array(LessonTitleSchema).parse(jsonGetTitles);
+
+    expect(lessonTitles.length).toBeGreaterThan(expectedZeroNumber);
+
+    const ids = lessonTitles.map((l) => l.id);
+    expect(new Set(ids).size).toBe(ids.length);
+
+    lessonTitles.forEach((lesson) => {
+      expect(lesson.title.length).toBeGreaterThan(expectedZeroNumber);
     });
   });
 
@@ -105,13 +86,12 @@ test.describe('Lessons API', () => {
       await lessonApi.getPreview(courseId);
 
     expectStatusOK(resGetPreview);
-    expect(Array.isArray(jsonGetPreview.previewLessons)).toBe(true);
-    expect(jsonGetPreview.previewLessons.length).toBeGreaterThan(
-      expectedLengthNumber,
-    );
-    expect(typeof jsonGetPreview.totalLessons).toBe('number');
-    expect(jsonGetPreview.previewLessons.length).toBeLessThanOrEqual(
-      jsonGetPreview.totalLessons,
+
+    const preview = PreviewLessonsResponseSchema.parse(jsonGetPreview);
+
+    expect(preview.previewLessons.length).toBeGreaterThan(expectedLengthNumber);
+    expect(preview.previewLessons.length).toBeLessThanOrEqual(
+      preview.totalLessons,
     );
   });
 
@@ -134,10 +114,19 @@ test.describe('Lessons API', () => {
       lessonId,
     );
 
+    const content = LessonContentResponseSchema.parse(jsonGetContent);
+
+    if ('videoUrl' in content.content) {
+      expect(content.content.videoUrl.length).toBeGreaterThan(
+        expectedZeroNumber,
+      );
+      expect(content.content.transcript.length).toBeGreaterThan(
+        expectedZeroNumber,
+      );
+    }
+
     expectStatusOK(resGetLessons);
     expectStatusOK(resGetContent);
-    expect(typeof jsonGetContent.content.videoUrl).toBe('string');
-    expect(typeof jsonGetContent.content.transcript).toBe('string');
   });
 
   test('should mark lesson as completed for authorized user', async ({
