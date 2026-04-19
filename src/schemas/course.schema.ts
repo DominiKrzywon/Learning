@@ -24,6 +24,8 @@ export const CourseDetailsSchema = z.object({
   duration: z.string(),
 });
 
+export const CoursesListResponseSchema = z.array(CourseDetailsSchema);
+
 export const CourseRatingSchema = z.object({
   userId: z.number(),
   courseId: z.number(),

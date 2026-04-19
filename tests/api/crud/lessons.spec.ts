@@ -51,7 +51,6 @@ test.describe('Lessons API', () => {
       await lessonApi.getLessons(courseId);
 
     expectStatusOK(resGetLessons);
-    expect(Array.isArray(jsonGetLessons)).toBe(true);
     expect(jsonGetLessons.length).toBeGreaterThan(expectedZeroNumber);
 
     const validLessons = z.array(LessonSchema).parse(jsonGetLessons);

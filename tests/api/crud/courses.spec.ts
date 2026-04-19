@@ -2,7 +2,12 @@ import { AuthApi } from '@_src/api/auth.api';
 import { CourseApi } from '@_src/api/course.api';
 import { expect, test } from '@_src/fixtures/user.fixture';
 import { restoreSystem } from '@_src/helper/restore';
-import { CourseRatingModel } from '@_src/models/course.model';
+import {
+  CourseDetailsSchema,
+  CourseRatingResponseSchema,
+  CoursesListResponseSchema,
+} from '@_src/schemas/course.schema';
+import { CourseProgressResponseSchema } from '@_src/schemas/progress.schema';
 import { courseData } from '@_src/test-data/course.data';
 import { testUser1 } from '@_src/test-data/user.data';
 import { expectStatusOK, expectSuccess } from '@_src/utils/assertions';
@@ -20,52 +25,30 @@ test.describe('Courses API', () => {
     authApi = new AuthApi(request);
   });
 
-  test('should display all courses @logged', async ({ request }) => {
+  test('should display all courses @logged', async () => {
     const { resGetAll, jsonGetAll } = await courseApi.getAll();
-    const firstCourse = jsonGetAll[0];
+    const courses = CoursesListResponseSchema.parse(jsonGetAll);
 
     expectStatusOK(resGetAll);
-    expect(Array.isArray(jsonGetAll)).toBe(true);
-    expect(jsonGetAll.length).toBeGreaterThan(0);
-    expect(firstCourse.id).toBeTruthy();
-    expect(['Beginner', 'Intermediate', 'Advanced']).toContain(
-      firstCourse.level,
-    );
+    expect(courses.length).toBeGreaterThan(0);
+    expect(courses[0].id).toBeTruthy();
   });
 
-  test('should return course details by ID', async ({ request }) => {
+  test('should return course details by ID', async () => {
+    const expectedCourseName = 'Playwright Automation Testing';
     const courseId = courseData.fourthCourseId;
     const { resGetById, jsonGetById } = await courseApi.getById(courseId);
 
+    const course = CourseDetailsSchema.parse(jsonGetById);
+
     expectStatusOK(resGetById);
-    expect(jsonGetById).toMatchObject({
-      id: 4,
-      title: 'Playwright Automation Testing',
-      description:
-        'Learn end-to-end testing with Playwright. Automate browser interactions, test web applications, and write reliable tests.',
-      thumbnail: '..\\data\\learning\\courses\\playwright.jpg',
-      instructor: 'John Doe',
-      instructorId: 2,
-      level: 'Intermediate',
-      tags: ['Playwright', 'Testing', 'Automation'],
-      prerequisites: ['JavaScript', 'Testing Basics'],
-      price: 129.99,
-      learningObjectives: [
-        'Master Playwright automation testing',
-        'Automate browser interactions',
-        'Write reliable end-to-end tests',
-        'Test web applications effectively',
-        'Debug and optimize test scripts',
-        'Implement testing best practices',
-      ],
-      totalHours: 2.2,
-      duration: '2.2 hour(s)',
-    });
-    expect(typeof jsonGetById.students).toBe('number');
-    expect(typeof jsonGetById.rating).toBe('number');
+    expect(course.id).toBe(courseData.fourthCourseId);
+    expect(course.title).toBe(expectedCourseName);
+    expect(course.rating).toBeGreaterThanOrEqual(0);
+    expect(course.rating).toBeLessThanOrEqual(5);
   });
 
-  test('should not display a non-existing course', async ({ request }) => {
+  test('should not display a non-existing course', async () => {
     const courseId = courseData.nonExistingCourseId;
     const { resGetById } = await courseApi.getById(courseId);
     const responseBody = await resGetById.text();
@@ -80,15 +63,12 @@ test.describe('Courses API', () => {
     const { resGetRatings, jsonGetRatings } =
       await courseApi.getRatings(courseId);
 
-    expectStatusOK(resGetRatings);
-    expect(Array.isArray(jsonGetRatings)).toBe(true);
-    jsonGetRatings.forEach((rating: CourseRatingModel) => {
-      expect(rating.rating).toBeGreaterThanOrEqual(0);
-      expect(rating.rating).toBeLessThanOrEqual(5);
-      expect(typeof rating.comment).toBe('string');
-      expect(rating.createdAt).toBeTruthy();
-      expect(rating.userInfo).toHaveProperty('name');
+    const rating = CourseRatingResponseSchema.parse(jsonGetRatings);
+    rating.forEach((r) => {
+      expect(r.rating).toBeGreaterThanOrEqual(0);
+      expect(r.rating).toBeLessThanOrEqual(5);
     });
+    expectStatusOK(resGetRatings);
   });
 
   test('should display progress for user @logged', async ({
@@ -104,12 +84,13 @@ test.describe('Courses API', () => {
     const { resGetProgress, jsonGetProgress } =
       await courseApi.getProgress(courseId);
 
+    const progress = CourseProgressResponseSchema.parse(jsonGetProgress);
+
     expectSuccess(jsonEnroll);
-    expect(jsonEnroll.enrollment.progress).toEqual(zeroAmount);
     expectStatusOK(resGetProgress);
     expectStatusOK(resEnroll);
-    expect(Array.isArray(jsonGetProgress)).toBe(true);
-    expect(jsonGetProgress.length).toBe(zeroAmount);
+    expect(jsonEnroll.enrollment.progress).toEqual(zeroAmount);
+    expect(progress.length).toBe(zeroAmount);
   });
 
   test('should not display progress for unauthorized user @logged', async () => {

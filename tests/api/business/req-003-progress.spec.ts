@@ -151,7 +151,6 @@ test.describe('REQ-003 User Progress Monitor', () => {
       PreviewLessonsResponseSchema.parse(jsonGetPreview);
 
     expectStatusOK(resGetPreview);
-    expect(Array.isArray(previewLessonsSchema.previewLessons)).toBe(true);
     expect(previewLessons.length).toBeGreaterThan(expectedZeroCount);
     expect(resGetProgress.status()).toBe(HTTP_STATUS.FORBIDDEN);
     expect(jsonGetProgress.error.message).toBe(expectedErrorMessage);
