@@ -14,7 +14,9 @@ export async function createUserAndLogin(
   const authApi = new AuthApi(request);
   const { resRegister, jsonRegister } = await authApi.register(finalUserData);
   if (!resRegister.ok()) {
-    throw new Error('Registration failed!');
+    throw new Error(
+      `Registration failed! Status: ${resRegister.status()} Body: ${JSON.stringify(jsonRegister)}`,
+    );
   }
 
   const credentials = {
