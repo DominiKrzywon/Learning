@@ -44,6 +44,9 @@ jobs:
         if: steps.cache-playwrgiht.outputs.cache-hit != 'true'
         run: npx playwright install --with-deps chromium
 
+      - name: Create tmp directory
+        run: mkdir -p tmp
+
       - name: Wait for GAD to be ready
         run: |
           echo "Waiting for app on port 3000"
@@ -59,6 +62,8 @@ jobs:
           BASE_URL: ${{ vars.BASE_URL }}
           USER_EMAIL: ${{ secrets.USER_EMAIL }}
           USER_PASSWORD: ${{ secrets.USER_PASSWORD }}
+          USER_NAME: ${{ vars.USER_NAME }}
+          AVATAR: ${{ vars.AVATAR }}
         run: |
           npm run test
       - name: Upload Playwright Report
