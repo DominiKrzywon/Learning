@@ -39,4 +39,4 @@ export const CourseRatingSchema = z.object({
   }),
 });
 
-export const CourseRatingResponseSchema = z.array(CourseRatingSchema);
+export const CourseRatingsResponseSchema = z.array(CourseRatingSchema);

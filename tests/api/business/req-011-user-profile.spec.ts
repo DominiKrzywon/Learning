@@ -57,7 +57,6 @@ test.describe('REQ-011 User Profile Management', () => {
     request,
     loggedUser,
   }) => {
-    const expectedErrorMessage = 'Invalid credentials';
     const { authHeader, userId, username, password } = loggedUser;
     userApi = new UserApi(request, authHeader);
     authApi = new AuthApi(request);

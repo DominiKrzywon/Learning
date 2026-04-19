@@ -47,10 +47,14 @@ export const LessonSchema = z.discriminatedUnion('type', [
   }),
 ]);
 
+export const LessonsListResponseSchema = z.array(LessonSchema);
+
 export const LessonTitleSchema = z.object({
   id: z.number(),
   title: z.string(),
 });
+
+export const LessonTitlesResponseSchema = z.array(LessonTitleSchema);
 
 export const PreviewLessonsResponseSchema = z.object({
   previewLessons: z.array(LessonSchema),

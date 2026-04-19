@@ -4,7 +4,7 @@ import { expect, test } from '@_src/fixtures/user.fixture';
 import { restoreSystem } from '@_src/helper/restore';
 import {
   CourseDetailsSchema,
-  CourseRatingResponseSchema,
+  CourseRatingsResponseSchema,
   CoursesListResponseSchema,
 } from '@_src/schemas/course.schema';
 import { CourseProgressResponseSchema } from '@_src/schemas/progress.schema';
@@ -63,8 +63,8 @@ test.describe('Courses API', () => {
     const { resGetRatings, jsonGetRatings } =
       await courseApi.getRatings(courseId);
 
-    const rating = CourseRatingResponseSchema.parse(jsonGetRatings);
-    rating.forEach((r) => {
+    const ratings = CourseRatingsResponseSchema.parse(jsonGetRatings);
+    ratings.forEach((r) => {
       expect(r.rating).toBeGreaterThanOrEqual(0);
       expect(r.rating).toBeLessThanOrEqual(5);
     });
@@ -76,13 +76,13 @@ test.describe('Courses API', () => {
     loggedUser,
   }) => {
     const zeroAmount = 0;
-    const courseApi = new CourseApi(request, loggedUser.authHeader);
-    const { resEnroll, jsonEnroll } = await courseApi.enroll(
+    const authorizedCourseApi = new CourseApi(request, loggedUser.authHeader);
+    const { resEnroll, jsonEnroll } = await authorizedCourseApi.enroll(
       courseId,
       loggedUser.userId,
     );
     const { resGetProgress, jsonGetProgress } =
-      await courseApi.getProgress(courseId);
+      await authorizedCourseApi.getProgress(courseId);
 
     const progress = CourseProgressResponseSchema.parse(jsonGetProgress);
 
@@ -99,7 +99,6 @@ test.describe('Courses API', () => {
 
     expectSuccess(jsonLogin);
     expectStatusOK(resLogin);
-    expect(resGetProgress).toBeDefined();
     expect(resGetProgress.status()).toBe(HTTP_STATUS.FORBIDDEN);
   });
 

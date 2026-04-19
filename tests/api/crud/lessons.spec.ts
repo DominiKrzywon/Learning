@@ -4,14 +4,13 @@ import { expect, test } from '@_src/fixtures/user.fixture';
 import { restoreSystem } from '@_src/helper/restore';
 import {
   LessonContentResponseSchema,
-  LessonSchema,
-  LessonTitleSchema,
+  LessonTitlesResponseSchema,
+  LessonsListResponseSchema,
   PreviewLessonsResponseSchema,
 } from '@_src/schemas/lessons.schema';
 import { courseData } from '@_src/test-data/course.data';
 import { expectStatusOK, expectSuccess } from '@_src/utils/assertions';
 import { HTTP_STATUS } from '@_src/utils/http-status';
-import z from 'zod';
 
 test.describe('Lessons API', () => {
   const courseId = courseData.defaultCourseId;
@@ -35,11 +34,11 @@ test.describe('Lessons API', () => {
     expect(jsonGetLessons.error.message).toBe(expectedErrorMessage);
   });
 
-  test('should get lessons with authorize user', async ({
+  test('should get lessons with authorized user', async ({
     request,
     loggedUser,
   }) => {
-    const expectedLengthNumber = 1;
+    const expectedMinLessonId = 1;
     const expectedZeroNumber = 0;
     const { authHeader, userId } = loggedUser;
     const courseApi = new CourseApi(request, authHeader);
@@ -50,12 +49,13 @@ test.describe('Lessons API', () => {
     const { resGetLessons, jsonGetLessons } =
       await lessonApi.getLessons(courseId);
 
-    expectStatusOK(resGetLessons);
-    expect(jsonGetLessons.length).toBeGreaterThan(expectedZeroNumber);
+    const lessonsList = LessonsListResponseSchema.parse(jsonGetLessons);
 
-    const validLessons = z.array(LessonSchema).parse(jsonGetLessons);
-    validLessons.forEach((lesson) => {
-      expect(lesson.id).toBeGreaterThanOrEqual(expectedLengthNumber);
+    expectStatusOK(resGetLessons);
+    expect(lessonsList.length).toBeGreaterThan(expectedZeroNumber);
+
+    lessonsList.forEach((lesson) => {
+      expect(lesson.id).toBeGreaterThanOrEqual(expectedMinLessonId);
     });
   });
 
@@ -66,7 +66,7 @@ test.describe('Lessons API', () => {
 
     expectStatusOK(resGetTitles);
 
-    const lessonTitles = z.array(LessonTitleSchema).parse(jsonGetTitles);
+    const lessonTitles = LessonTitlesResponseSchema.parse(jsonGetTitles);
 
     expect(lessonTitles.length).toBeGreaterThan(expectedZeroNumber);
 
@@ -106,8 +106,9 @@ test.describe('Lessons API', () => {
     await courseApi.enroll(courseId, userId);
     const { resGetLessons, jsonGetLessons } =
       await lessonApi.getLessons(courseId);
+    const lessonsList = LessonsListResponseSchema.parse(jsonGetLessons);
 
-    const lessonId = jsonGetLessons[expectedZeroNumber].id;
+    const lessonId = lessonsList[expectedZeroNumber].id;
     const { resGetContent, jsonGetContent } = await lessonApi.getContent(
       courseId,
       lessonId,
@@ -126,6 +127,7 @@ test.describe('Lessons API', () => {
 
     expectStatusOK(resGetLessons);
     expectStatusOK(resGetContent);
+    expect(lessonsList.length).toBeGreaterThan(expectedZeroNumber);
   });
 
   test('should mark lesson as completed for authorized user', async ({
@@ -140,8 +142,9 @@ test.describe('Lessons API', () => {
     await courseApi.enroll(courseId, userId);
     const { resGetLessons, jsonGetLessons } =
       await lessonApi.getLessons(courseId);
+    const lessonsList = LessonsListResponseSchema.parse(jsonGetLessons);
 
-    const lessonId = jsonGetLessons[expectedZeroNumber].id;
+    const lessonId = lessonsList[expectedZeroNumber].id;
     const { resComplete, jsonComplete } = await lessonApi.complete(
       courseId,
       lessonId,
@@ -151,5 +154,6 @@ test.describe('Lessons API', () => {
     expectStatusOK(resGetLessons);
     expectStatusOK(resComplete);
     expectSuccess(jsonComplete);
+    expect(lessonsList.length).toBeGreaterThan(expectedZeroNumber);
   });
 });

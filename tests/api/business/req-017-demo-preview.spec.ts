@@ -4,6 +4,7 @@ import { expect, test } from '@_src/fixtures/user.fixture';
 import { restoreSystem } from '@_src/helper/restore';
 import {
   LessonContentResponseSchema,
+  LessonsListResponseSchema,
   PreviewLessonsResponseSchema,
 } from '@_src/schemas/lessons.schema';
 import { courseData } from '@_src/test-data/course.data';
@@ -33,9 +34,7 @@ test.describe('REQ-017 Free Demo Preview', () => {
     const preview = PreviewLessonsResponseSchema.parse(jsonGetPreview);
 
     expectStatusOK(resGetPreview);
-    expect(preview.previewLessons.length).toBeLessThan(
-      jsonGetPreview.totalLessons,
-    );
+    expect(preview.previewLessons.length).toBeLessThan(preview.totalLessons);
   });
 
   test('REQ-017 should show more content to enrolled user than preview @logged', async ({
@@ -48,19 +47,21 @@ test.describe('REQ-017 Free Demo Preview', () => {
     const { resGetPreview, jsonGetPreview } =
       await lessonApi.getPreview(courseId);
 
-    const previewCount = jsonGetPreview.previewLessons.length;
-    const totalLessons = jsonGetPreview.totalLessons;
+    const preview = PreviewLessonsResponseSchema.parse(jsonGetPreview);
+    const previewCount = preview.previewLessons.length;
+    const totalLessons = preview.totalLessons;
 
     const { resEnroll, jsonEnroll } = await courseApi.enroll(courseId, userId);
     const { resGetLessons, jsonGetLessons } =
       await lessonApi.getLessons(courseId);
+    const lessons = LessonsListResponseSchema.parse(jsonGetLessons);
 
     expectStatusOK(resGetPreview);
     expectStatusOK(resEnroll);
     expectStatusOK(resGetLessons);
     expectSuccess(jsonEnroll);
-    expect(jsonGetLessons.length).toEqual(totalLessons);
-    expect(jsonGetLessons.length).toBeGreaterThan(previewCount);
+    expect(lessons.length).toEqual(totalLessons);
+    expect(lessons.length).toBeGreaterThan(previewCount);
   });
 
   test('REQ-017 should return full lesson content for enrolled user @logged', async ({
@@ -76,7 +77,8 @@ test.describe('REQ-017 Free Demo Preview', () => {
     const { resEnroll } = await courseApi.enroll(courseId, userId);
     const { resGetLessons, jsonGetLessons } =
       await lessonApi.getLessons(courseId);
-    const lessonId = jsonGetLessons[expectedZeroNumber].id;
+    const lessons = LessonsListResponseSchema.parse(jsonGetLessons);
+    const lessonId = lessons[expectedZeroNumber].id;
     const { resGetContent, jsonGetContent } = await lessonApi.getContent(
       courseId,
       lessonId,
@@ -87,7 +89,8 @@ test.describe('REQ-017 Free Demo Preview', () => {
     expectStatusOK(resEnroll);
     expectStatusOK(resGetLessons);
     expectStatusOK(resGetContent);
-    
+    expect(lessons.length).toBeGreaterThan(expectedZeroNumber);
+
     if ('videoUrl' in preview.content) {
       expect(preview.content.videoUrl).toBeTruthy();
     } else if ('text' in preview.content) {
@@ -105,7 +108,8 @@ test.describe('REQ-017 Free Demo Preview', () => {
 
     const { resGetPreview, jsonGetPreview } =
       await lessonApi.getPreview(courseId);
-    const previewLessonId = jsonGetPreview.previewLessons[0].id;
+    const preview = PreviewLessonsResponseSchema.parse(jsonGetPreview);
+    const previewLessonId = preview.previewLessons[0].id;
     const { resGetContent, jsonGetContent } = await lessonApi.getContent(
       courseId,
       previewLessonId,

@@ -141,17 +141,14 @@ test.describe('REQ-003 User Progress Monitor', () => {
 
     const { resGetPreview, jsonGetPreview } =
       await lessonApi.getPreview(courseId);
-    const { previewLessons } = jsonGetPreview;
-    const lessonId = previewLessons[expectedZeroCount].id;
+    const preview = PreviewLessonsResponseSchema.parse(jsonGetPreview);
+    const lessonId = preview.previewLessons[expectedZeroCount].id;
     await lessonApi.complete(courseId, lessonId, userId);
     const { resGetProgress, jsonGetProgress } =
       await courseApi.getProgress(courseId);
 
-    const previewLessonsSchema =
-      PreviewLessonsResponseSchema.parse(jsonGetPreview);
-
     expectStatusOK(resGetPreview);
-    expect(previewLessons.length).toBeGreaterThan(expectedZeroCount);
+    expect(preview.previewLessons.length).toBeGreaterThan(expectedZeroCount);
     expect(resGetProgress.status()).toBe(HTTP_STATUS.FORBIDDEN);
     expect(jsonGetProgress.error.message).toBe(expectedErrorMessage);
   });

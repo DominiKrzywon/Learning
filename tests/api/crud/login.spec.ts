@@ -23,8 +23,8 @@ test.describe('Login API', () => {
   });
 
   test('should not login with incorrect credentials @logged', async () => {
-    const { resLogin, jsonLogin } = await authApi.login(testUserIncorrect);
     const expectedErrorMessage = 'Invalid credentials';
+    const { resLogin, jsonLogin } = await authApi.login(testUserIncorrect);
 
     expect(resLogin.status()).toBe(HTTP_STATUS.UNAUTHORIZED);
     expect(jsonLogin).toHaveProperty('error.message', expectedErrorMessage);
@@ -32,18 +32,18 @@ test.describe('Login API', () => {
 
   test('should successfully login after registration @logged', async () => {
     const registerUserData = prepareRandomUser();
+    const credentials = {
+      username: registerUserData.username,
+      password: registerUserData.password,
+    };
 
     const { resRegister, jsonRegister } =
       await authApi.register(registerUserData);
 
+    const { resLogin, jsonLogin } = await authApi.login(credentials);
+
     expectStatusOK(resRegister);
     expectSuccess(jsonRegister);
-
-    const { resLogin, jsonLogin } = await authApi.login({
-      username: registerUserData.username,
-      password: registerUserData.password,
-    });
-
     expectStatusOK(resLogin);
     expectSuccess(jsonLogin);
     expect(jsonLogin.access_token).toBeTruthy();
