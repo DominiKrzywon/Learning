@@ -3,7 +3,8 @@ import { CourseApi } from '@_src/api/course.api';
 import { LessonApi } from '@_src/api/lesson.api';
 import { expect, test } from '@_src/fixtures/user.fixture';
 import { restoreSystem } from '@_src/helper/restore';
-import { LessonModel } from '@_src/models/lessons.model';
+import { PreviewLessonsResponseSchema } from '@_src/schemas/lessons.schema';
+import { CourseProgressResponseSchema } from '@_src/schemas/progress.schema';
 import { courseData } from '@_src/test-data/course.data';
 import { expectStatusOK, expectSuccess } from '@_src/utils/assertions';
 import { HTTP_STATUS } from '@_src/utils/http-status';
@@ -48,22 +49,25 @@ test.describe('REQ-003 User Progress Monitor', () => {
       jsonGetProgress: afterJsonGetProgress,
     } = await courseApi.getProgress(courseId);
 
+    const progressBefore = CourseProgressResponseSchema.parse(
+      beforeJsonGetProgress,
+    );
+    const progressAfter =
+      CourseProgressResponseSchema.parse(afterJsonGetProgress);
+
     expectStatusOK(beforeResGetProgress);
-    expect(beforeJsonGetProgress.length).toBe(expectedEmptyProgressCount);
     expectStatusOK(resEnroll);
     expectStatusOK(resGetLessons);
     expectStatusOK(resComplete);
     expectStatusOK(afterResGetProgress);
-    expect(afterJsonGetProgress[expectedEmptyProgressCount].completed).toBe(
-      true,
-    );
-    expect(afterJsonGetProgress[expectedEmptyProgressCount].lessonId).toBe(
-      lessonId,
-    );
-    expect(afterJsonGetProgress[expectedEmptyProgressCount].courseId).toBe(
-      courseId,
-    );
     expectSuccess(jsonComplete);
+
+    expect(progressBefore.length).toBe(expectedEmptyProgressCount);
+    expect(progressAfter).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ lessonId, courseId, completed: true }),
+      ]),
+    );
   });
 
   test('REQ-003 should persist progress after relogin @logged', async ({
@@ -94,16 +98,35 @@ test.describe('REQ-003 User Progress Monitor', () => {
       jsonGetProgress: afterJsonGetProgress,
     } = await courseApi.getProgress(courseId);
 
+    const progressBefore = CourseProgressResponseSchema.parse(jsonGetProgress);
+    const progressAfter =
+      CourseProgressResponseSchema.parse(afterJsonGetProgress);
+
+    const beforeEntry = progressBefore.find(
+      (p) => p.lessonId === lessonId && p.courseId === courseId,
+    );
+
+    const afterEntry = progressAfter.find(
+      (p) => p.lessonId === lessonId && p.courseId === courseId,
+    );
+
+    expect(beforeEntry).toBeDefined();
+    expect(afterEntry).toBeDefined();
+
+    expect(beforeEntry?.completed).toBe(true);
+    expect(afterEntry?.completed).toBe(true);
+
+    expect(afterEntry?.completedAt).toEqual(beforeEntry?.completedAt);
+    expect(progressAfter.length).toEqual(progressBefore.length);
+
     expectStatusOK(resEnroll);
     expectStatusOK(resGetLessons);
     expectStatusOK(resComplete);
     expectStatusOK(resLogin);
     expectStatusOK(afterResGetProgress);
-    expect(resGetProgress).toBeDefined();
+    expectStatusOK(resGetProgress);
     expectSuccess(jsonComplete);
-    expect(jsonGetProgress[expectedZeroCount].completed).toBe(true);
     expectSuccess(jsonLogin);
-    expect(afterJsonGetProgress[expectedZeroCount].completed).toBe(true);
   });
 
   test('REQ-003 should reject lesson completion for non-enrolled course @logged', async ({
@@ -124,17 +147,12 @@ test.describe('REQ-003 User Progress Monitor', () => {
     const { resGetProgress, jsonGetProgress } =
       await courseApi.getProgress(courseId);
 
-    expectStatusOK(resGetPreview);
-    expect(Array.isArray(previewLessons)).toBe(true);
-    expect(previewLessons.length).toBeGreaterThan(expectedZeroCount);
-    previewLessons.forEach((lesson: LessonModel) => {
-      expect(typeof lesson.id).toBe('number');
-      expect(typeof lesson.title).toBe('string');
-      expect(typeof lesson.type).toBe('string');
-      expect(typeof lesson.completed).toBe('boolean');
-      expect(typeof lesson.content).toBe('object');
-    });
+    const previewLessonsSchema =
+      PreviewLessonsResponseSchema.parse(jsonGetPreview);
 
+    expectStatusOK(resGetPreview);
+    expect(Array.isArray(previewLessonsSchema.previewLessons)).toBe(true);
+    expect(previewLessons.length).toBeGreaterThan(expectedZeroCount);
     expect(resGetProgress.status()).toBe(HTTP_STATUS.FORBIDDEN);
     expect(jsonGetProgress.error.message).toBe(expectedErrorMessage);
   });
