@@ -2,7 +2,7 @@ import { BASE_URL } from '@_config/env.config';
 import { defineConfig, devices } from '@playwright/test';
 import * as path from 'path';
 
-export const STORAGE_STAGE = path.join(__dirname, 'tmp/session.json');
+export const STORAGE_STAGE = path.join(process.cwd(), 'tmp/session.json');
 export const RESPONSE_TIMEOUT = 10_000;
 
 export default defineConfig({

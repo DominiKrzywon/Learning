@@ -22,27 +22,40 @@ async function globalSetup(config: FullConfig): Promise<void> {
       throw new Error(`Health check failed for ${baseURL}`);
     }
 
-    const registerResponse = await requestContext.post(
-      '/api/learning/auth/register',
+    await requestContext.post('/api/learning/auth/register', {
+      data: {
+        username: USER_NAME,
+        password: USER_PASSWORD,
+        email: USER_EMAIL,
+        firstName: 'Auto',
+        lastName: 'User',
+        avatar: AVATAR,
+      },
+    });
+
+    const loginResponse = await requestContext.post(
+      '/api/learning/auth/login',
       {
         data: {
           username: USER_NAME,
           password: USER_PASSWORD,
-          email: USER_EMAIL,
-          firstName: 'Auto',
-          lastName: 'User',
-          avatar: AVATAR,
         },
       },
     );
 
-    if (![200, 400, 422].includes(registerResponse.status())) {
-      throw new Error(
-        `Unable to prepare shared user ${USER_NAME}, status ${registerResponse.status()}`,
-      );
+    if (!loginResponse.ok()) {
+      throw new Error(`Login failed: ${loginResponse.status()}`);
     }
-  } catch {
-    throw new Error(`Failed to connect to ${baseURL}!`);
+
+    const storage = await requestContext.storageState();
+
+    fs.mkdirSync('tmp', { recursive: true });
+    fs.writeFileSync(STORAGE_STAGE, JSON.stringify(storage));
+
+    console.log('Session saved to:', STORAGE_STAGE);
+  } catch (err) {
+    console.error(err);
+    throw new Error(`Failed to prepare test user for ${baseURL}`);
   } finally {
     await requestContext.dispose();
   }
