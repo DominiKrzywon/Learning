@@ -29,12 +29,18 @@ export default defineConfig({
     },
     {
       name: 'chromium-non-logged',
+      grepInvert: /@logged/,
       testDir: './tests/ui',
       use: { ...devices['Desktop Chrome'] },
     },
     {
+      name: 'setup',
+      testMatch: '*.setup.ts',
+    },
+    {
       name: 'chromium-logged',
       testDir: './tests/ui',
+      dependencies: ['setup'],
       grep: /@logged/,
       use: { ...devices['Desktop Chrome'], storageState: STORAGE_STAGE },
     },
