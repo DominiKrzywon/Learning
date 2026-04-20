@@ -28,7 +28,13 @@ export default defineConfig({
       testDir: './tests/api',
     },
     {
+      name: 'chromium-non-logged',
+      testDir: './tests/ui',
+      use: { ...devices['Desktop Chrome'] },
+    },
+    {
       name: 'chromium-logged',
+      testDir: './tests/ui',
       grep: /@logged/,
       use: { ...devices['Desktop Chrome'], storageState: STORAGE_STAGE },
     },
