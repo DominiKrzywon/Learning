@@ -1,14 +1,12 @@
-import { USER_NAME, USER_PASSWORD } from '@_config/env.config';
-import { LoginPage } from '@_src/ui/pages/login.page';
-import { WelcomePage } from '@_src/ui/pages/welcome.page';
-import test, { expect } from '@playwright/test';
+import { expect, test } from '@_src/merge.fixture';
+import { testUserLearning } from '@_src/ui/test-data/user.data';
 
-test('AUTH-001 should login with valid credentials', async ({ page }) => {
-  const loginPage = new LoginPage(page);
-  const welcomePage = new WelcomePage(page);
-
+test('AUTH-001 should login with valid credentials', async ({
+  loginPage,
+  welcomePage,
+}) => {
   await loginPage.goto();
-  await loginPage.login({ username: USER_NAME, password: USER_PASSWORD });
+  await loginPage.login(testUserLearning);
   await welcomePage.waitForPageToLoadUrl();
 
   await expect(loginPage.courseList).toBeVisible();
