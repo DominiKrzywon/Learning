@@ -9,3 +9,4 @@ node_modules/
 tmp/*
 !tmp/.gitkeep
 .instructions.md
+/refactor.md
