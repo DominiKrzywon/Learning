@@ -1,6 +1,6 @@
 import { prepareRandomUser } from '@_src/factory/user.factory';
 import { createUserAndLogin } from '@_src/helper/user';
-import { TestUser } from '@_src/types/test-user.type';
+import { TestUser } from '@_src/ui/types/test-user.type';
 import { test as base } from '@playwright/test';
 
 export const test = base.extend<{ loggedUser: TestUser }>({

@@ -2,7 +2,7 @@ import { AuthApi } from '@_src/api/auth.api';
 import { prepareRandomUser } from '@_src/factory/user.factory';
 import { loginAndGetUser } from '@_src/helper/auth';
 import { RegisterUserModel } from '@_src/models/user.model';
-import { TestUser } from '@_src/types/test-user.type';
+import { TestUser } from '@_src/ui/types/test-user.type';
 import { APIRequestContext } from '@playwright/test';
 
 export async function createUserAndLogin(
