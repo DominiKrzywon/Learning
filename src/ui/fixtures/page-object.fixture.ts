@@ -16,7 +16,6 @@ export const pageObjectTest = baseTest.extend<Pages>({
 
   welcomePage: async ({ page }, use) => {
     const welcomePage = new WelcomePage(page);
-    await welcomePage.goto();
     await use(welcomePage);
   },
 });

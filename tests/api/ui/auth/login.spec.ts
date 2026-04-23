@@ -5,7 +5,6 @@ test('AUTH-001 should login with valid credentials', async ({
   loginPage,
   welcomePage,
 }) => {
-  await loginPage.goto();
   await loginPage.login(testUserLearning);
   await welcomePage.waitForPageToLoadUrl();
 
