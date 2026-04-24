@@ -2,9 +2,16 @@ import { BasePage } from '@_src/ui/pages/base.page';
 import { Page } from '@playwright/test';
 
 export class WelcomePage extends BasePage {
-  url = 'learning/dashboard.html';
+  url = 'learning/welcome.html';
+  goToLogin = this.page.getByRole('link', { name: 'Sign In' });
 
   constructor(page: Page) {
     super(page);
+  }
+
+  async login(): Promise<WelcomePage> {
+    await this.goToLogin.click();
+
+    return new WelcomePage(this.page);
   }
 }

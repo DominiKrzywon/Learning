@@ -5,3 +5,13 @@ export const testUserLearning: LoginUserModel = {
   username: USER_NAME,
   password: USER_PASSWORD,
 };
+
+export const testUserInvalidPassword: LoginUserModel = {
+  username: USER_NAME,
+  password: 'invalid_password',
+};
+
+export const testUserInvalidUsername: LoginUserModel = {
+  username: 'invalid_username',
+  password: USER_PASSWORD,
+};

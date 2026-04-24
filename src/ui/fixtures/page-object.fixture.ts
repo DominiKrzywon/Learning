@@ -1,9 +1,11 @@
+import { DashboardPage } from '@_src/ui/pages/dashboard.page';
 import { LoginPage } from '@_src/ui/pages/login.page';
 import { WelcomePage } from '@_src/ui/pages/welcome.page';
 import { test as baseTest } from '@playwright/test';
 
 interface Pages {
   loginPage: LoginPage;
+  dashboardPage: DashboardPage;
   welcomePage: WelcomePage;
 }
 
@@ -17,5 +19,10 @@ export const pageObjectTest = baseTest.extend<Pages>({
   welcomePage: async ({ page }, use) => {
     const welcomePage = new WelcomePage(page);
     await use(welcomePage);
+  },
+
+  dashboardPage: async ({ page }, use) => {
+    const dashboardPage = new DashboardPage(page);
+    await use(dashboardPage);
   },
 });
