@@ -30,3 +30,12 @@ test('AUTH-003 should not login with invalid username', async ({
 
   await expect(loginPage.errorMessage).toBeVisible();
 });
+
+test('AUTH-004 should logout from dashboard @logged', async ({
+  dashboardPage,
+}) => {
+  const welcomePage = await dashboardPage.logout();
+  await welcomePage.waitForPageToLoadUrl();
+
+  await expect(welcomePage.logo).toBeVisible();
+});

@@ -23,6 +23,7 @@ export const pageObjectTest = baseTest.extend<Pages>({
 
   dashboardPage: async ({ page }, use) => {
     const dashboardPage = new DashboardPage(page);
+    await dashboardPage.goto();
     await use(dashboardPage);
   },
 });

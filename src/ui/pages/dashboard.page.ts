@@ -1,4 +1,5 @@
 import { BasePage } from '@_src/ui/pages/base.page';
+import { WelcomePage } from '@_src/ui/pages/welcome.page';
 import { Page } from '@playwright/test';
 
 export class DashboardPage extends BasePage {
@@ -10,9 +11,9 @@ export class DashboardPage extends BasePage {
     super(page);
   }
 
-  async logout(): Promise<DashboardPage> {
+  async logout(): Promise<WelcomePage> {
     await this.logOut.click();
 
-    return new DashboardPage(this.page);
+    return new WelcomePage(this.page);
   }
 }
