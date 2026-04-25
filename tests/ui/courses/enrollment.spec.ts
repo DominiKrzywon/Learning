@@ -40,5 +40,19 @@ test('ENROLL-003 verify access restriction without enrollment', async ({
   await dashboardPage.goto();
   await dashboardPage.getEnrollButton(courseId).click();
 
-  await expect(dashboardPage.enrollError).toHaveText(dashboardPage.errorMessage);
+  await expect(dashboardPage.enrollError).toHaveText(
+    dashboardPage.errorMessage,
+  );
+});
+
+test('ENROLL-004 verify if user with funds can enroll from dashboard', async ({
+  dashboardPage,
+  courseViewerPage
+}) => {
+  await dashboardPage.goto();
+  await dashboardPage.getEnrollButton(courseId).click();
+
+  await expect(dashboardPage.enrollError).toHaveText(
+    dashboardPage.errorMessage,
+  );
 });

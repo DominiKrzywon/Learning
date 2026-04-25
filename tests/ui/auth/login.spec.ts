@@ -47,3 +47,12 @@ test('AUTH-005 should cannot take lesson without login @non-logged', async ({
 
   await expect(dashboardPage.myCourses).toHaveClass(/disabled-link/);
 });
+
+test('AUTH-006 verify if session persists after page refresh @logged', async ({
+  dashboardPage,
+}) => {
+  await dashboardPage.goto();
+  await dashboardPage.reload();
+
+  await expect(dashboardPage.dashboardUsername).toBeVisible();
+});

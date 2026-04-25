@@ -7,6 +7,7 @@ export class DashboardPage extends BasePage {
   logOut = this.page.getByRole('link', { name: 'Sign Out' });
   courseList = this.page.locator('#courseList');
   myCourses = this.page.getByLabel('My Courses');
+  dashboardUsername = this.page.getByLabel('Username');
   enrollError = this.page.locator('.notification.error');
   errorMessage = 'Insufficient funds to enroll in this course';
 
@@ -18,6 +19,10 @@ export class DashboardPage extends BasePage {
     await this.logOut.click();
 
     return new WelcomePage(this.page);
+  }
+
+  async reload() {
+    await this.page.reload();
   }
 
   getCourse(courseId: number) {
