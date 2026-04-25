@@ -6,6 +6,7 @@ export class DashboardPage extends BasePage {
   url = 'learning/dashboard.html';
   logOut = this.page.getByRole('link', { name: 'Sign Out' });
   courseList = this.page.locator('#courseList');
+  myCourses = this.page.getByLabel('My Courses');
 
   constructor(page: Page) {
     super(page);

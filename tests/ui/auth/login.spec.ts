@@ -39,3 +39,11 @@ test('AUTH-004 should logout from dashboard @logged', async ({
 
   await expect(welcomePage.logo).toBeVisible();
 });
+
+test('AUTH-005 should cannot take lesson without login @non-logged', async ({
+  dashboardPage,
+}) => {
+  await dashboardPage.goto();
+
+  await expect(dashboardPage.myCourses).toHaveClass(/disabled-link/);
+});
