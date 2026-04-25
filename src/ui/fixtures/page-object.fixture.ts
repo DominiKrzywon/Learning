@@ -1,3 +1,5 @@
+import { CourseViewerPage } from '@_src/ui/pages/course-viewer.page';
+import { CourseDetailsPage } from '@_src/ui/pages/course.page';
 import { DashboardPage } from '@_src/ui/pages/dashboard.page';
 import { LoginPage } from '@_src/ui/pages/login.page';
 import { WelcomePage } from '@_src/ui/pages/welcome.page';
@@ -7,6 +9,8 @@ interface Pages {
   loginPage: LoginPage;
   dashboardPage: DashboardPage;
   welcomePage: WelcomePage;
+  courseDetailsPage: CourseDetailsPage;
+  courseViewerPage: CourseViewerPage;
 }
 
 export const pageObjectTest = baseTest.extend<Pages>({
@@ -25,5 +29,15 @@ export const pageObjectTest = baseTest.extend<Pages>({
     const dashboardPage = new DashboardPage(page);
     await dashboardPage.goto();
     await use(dashboardPage);
+  },
+
+  courseDetailsPage: async ({ page }, use) => {
+    const courseDetailsPage = new CourseDetailsPage(page);
+    await use(courseDetailsPage);
+  },
+
+  courseViewerPage: async ({ page }, use) => {
+    const courseViewerPage = new CourseViewerPage(page);
+    await use(courseViewerPage);
   },
 });

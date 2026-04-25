@@ -5,10 +5,10 @@ import { testUserLearning } from '@_src/ui/test-data/user.data';
 setup('login and save session', async ({ loginPage, page }) => {
   const expectedWelcomeTitle = 'Learning Dashboard';
 
-  const welcomePage = await loginPage.login(testUserLearning);
-  await welcomePage.waitForPageToLoadUrl();
+  const dashboardPage = await loginPage.login(testUserLearning);
+  await dashboardPage.waitForPageToLoadUrl();
 
-  const title = await welcomePage.getTitle();
+  const title = await dashboardPage.getTitle();
   expect(title).toContain(expectedWelcomeTitle);
 
   await page.context().storageState({ path: STORAGE_STAGE });
