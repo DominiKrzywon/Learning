@@ -5,54 +5,64 @@ import { expect, test } from '@_src/merge.fixture';
 const courseId = 4;
 const courseQuery = `?id=${courseId}`;
 
-test.beforeEach(async ({ page, loginPage }) => {
-  await restoreSystem(page.request);
-  const { username, password } = await createUserAndLogin(page.request);
-  await loginPage.login({ username, password });
-});
+test.describe('Tests for enrollment', () => {
+  test.beforeEach(async ({ page, loginPage }) => {
+    await restoreSystem(page.request);
+    const { username, password } = await createUserAndLogin(page.request);
+    await loginPage.login({ username, password });
+  });
 
-test('ENROLL-001 verify if auth user can enroll on course', async ({
-  courseDetailsPage,
-  courseViewerPage,
-}) => {
-  await courseDetailsPage.goto(courseQuery);
-  await courseDetailsPage.enroll();
+  test('ENROLL-001 verify if auth user can enroll on course', async ({
+    courseDetailsPage,
+    courseViewerPage,
+  }) => {
+    await courseDetailsPage.goto(courseQuery);
+    await courseDetailsPage.enroll();
 
-  await expect(courseViewerPage.url).toContain('course-viewer.html');
-  await expect(courseViewerPage.downloadTranscript).toBeVisible();
-  await expect(courseDetailsPage.enrollButton).not.toBeVisible();
-});
+    await expect(courseViewerPage.url).toContain('course-viewer.html');
+    await expect(courseViewerPage.downloadTranscript).toBeVisible();
+    await expect(courseDetailsPage.enrollButton).not.toBeVisible();
+  });
 
-test('ENROLL-002 verify if enrolled course appears on dashboard', async ({
-  courseDetailsPage,
-  dashboardPage,
-}) => {
-  await courseDetailsPage.goto(courseQuery);
-  await courseDetailsPage.enroll();
-  await dashboardPage.goto();
+  test('ENROLL-002 verify if enrolled course appears on dashboard', async ({
+    courseDetailsPage,
+    dashboardPage,
+  }) => {
+    await courseDetailsPage.goto(courseQuery);
+    await courseDetailsPage.enroll();
+    await dashboardPage.goto();
 
-  await expect(dashboardPage.getCourse(courseId)).toBeVisible();
-});
+    await expect(dashboardPage.getCourse(courseId)).toBeVisible();
+  });
 
-test('ENROLL-003 verify access restriction without enrollment', async ({
-  dashboardPage,
-}) => {
-  await dashboardPage.goto();
-  await dashboardPage.getEnrollButton(courseId).click();
+  test('ENROLL-003 verify access restriction without enrollment', async ({
+    dashboardPage,
+  }) => {
+    await dashboardPage.goto();
+    await dashboardPage.getEnrollButton(courseId).click();
 
-  await expect(dashboardPage.enrollError).toHaveText(
-    dashboardPage.errorMessage,
-  );
-});
+    await expect(dashboardPage.enrollError).toHaveText(
+      dashboardPage.errorMessage,
+    );
+  });
 
-test('ENROLL-004 verify if user with funds can enroll from dashboard', async ({
-  dashboardPage,
-  courseViewerPage
-}) => {
-  await dashboardPage.goto();
-  await dashboardPage.getEnrollButton(courseId).click();
+  test('ENROLL-004 verify if user with funds can enroll from dashboard', async ({
+    accountSettingsPage,
+    dashboardPage,
+    courseViewerPage,
+  }) => {
+    await accountSettingsPage.goto();
+    const topUpAmount = 500;
+    const { before, after } = await accountSettingsPage.topUpFunds(topUpAmount);
 
-  await expect(dashboardPage.enrollError).toHaveText(
-    dashboardPage.errorMessage,
-  );
+    expect(after - before).toBe(topUpAmount);
+    await expect(accountSettingsPage.topUpSuccessNotification).toContainText(
+      accountSettingsPage.topUpSuccessMessage(topUpAmount),
+    );
+
+    await dashboardPage.goto();
+    await dashboardPage.getEnrollButton(courseId).click();
+
+    await expect(courseViewerPage.downloadTranscript).toBeVisible();
+  });
 });

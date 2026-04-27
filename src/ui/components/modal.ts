@@ -1,11 +1,9 @@
-import { Locator, type Page } from '@playwright/test';
+import { Locator } from '@playwright/test';
 
 export class Modal {
-  readonly page: Page;
   readonly root: Locator;
 
-  constructor(page: Page, root: Locator) {
-    this.page = page;
+  constructor(root: Locator) {
     this.root = root;
   }
 
