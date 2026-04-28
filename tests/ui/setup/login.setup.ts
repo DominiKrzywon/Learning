@@ -1,11 +1,11 @@
 import { STORAGE_STAGE } from '@_pw-config';
 import { expect, test as setup } from '@_src/merge.fixture';
-import { testUserLearning } from '@_src/ui/test-data/user.data';
+import { testUserLearningUI } from '@_src/test-data/user.data';
 
 setup('login and save session', async ({ loginPage, page }) => {
   const expectedWelcomeTitle = 'Learning Dashboard';
 
-  const dashboardPage = await loginPage.login(testUserLearning);
+  const dashboardPage = await loginPage.login(testUserLearningUI);
   await dashboardPage.waitForPageToLoadUrl();
 
   const title = await dashboardPage.getTitle();

@@ -1,9 +1,10 @@
 import { restoreSystem } from '@_src/helper/restore';
 import { createUserAndLogin } from '@_src/helper/user';
 import { expect, test } from '@_src/merge.fixture';
+import { courseData } from '@_src/test-data/course.data';
+import { fundsTestData } from '@_src/test-data/funds.data';
 
-const courseId = 4;
-const courseQuery = `?id=${courseId}`;
+const courseQuery = `?id=${courseData.fourthCourseId}`;
 
 test.describe('Tests for enrollment', () => {
   test.beforeEach(async ({ page, loginPage }) => {
@@ -32,14 +33,16 @@ test.describe('Tests for enrollment', () => {
     await courseDetailsPage.enroll();
     await dashboardPage.goto();
 
-    await expect(dashboardPage.getCourse(courseId)).toBeVisible();
+    await expect(
+      dashboardPage.getCourse(courseData.fourthCourseId),
+    ).toBeVisible();
   });
 
   test('ENROLL-003 verify access restriction without enrollment', async ({
     dashboardPage,
   }) => {
     await dashboardPage.goto();
-    await dashboardPage.getEnrollButton(courseId).click();
+    await dashboardPage.getEnrollButton(courseData.fourthCourseId).click();
 
     await expect(dashboardPage.enrollError).toHaveText(
       dashboardPage.errorMessage,
@@ -52,16 +55,17 @@ test.describe('Tests for enrollment', () => {
     courseViewerPage,
   }) => {
     await accountSettingsPage.goto();
-    const topUpAmount = 500;
-    const { before, after } = await accountSettingsPage.topUpFunds(topUpAmount);
+    const { before, after } = await accountSettingsPage.topUpFunds(
+      fundsTestData.validAmount,
+    );
 
-    expect(after - before).toBe(topUpAmount);
+    expect(after - before).toBe(fundsTestData.validAmount);
     await expect(accountSettingsPage.topUpSuccessNotification).toContainText(
-      accountSettingsPage.topUpSuccessMessage(topUpAmount),
+      accountSettingsPage.topUpSuccessMessage(fundsTestData.validAmount),
     );
 
     await dashboardPage.goto();
-    await dashboardPage.getEnrollButton(courseId).click();
+    await dashboardPage.getEnrollButton(courseData.fourthCourseId).click();
 
     await expect(courseViewerPage.downloadTranscript).toBeVisible();
   });

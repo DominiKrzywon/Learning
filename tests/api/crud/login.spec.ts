@@ -1,7 +1,7 @@
 import { AuthApi } from '@_src/api/auth.api';
 import { prepareRandomUser } from '@_src/factory/user.factory';
 import { restoreSystem } from '@_src/helper/restore';
-import { testUser1, testUserIncorrect } from '@_src/test-data/user.data';
+import { testUserApi, testUserIncorrectApi } from '@_src/test-data/user.data';
 import { expectStatusOK, expectSuccess } from '@_src/utils/assertions';
 import { HTTP_STATUS } from '@_src/utils/http-status';
 import { expect, test } from '@playwright/test';
@@ -15,7 +15,7 @@ test.describe('Login API', () => {
   });
 
   test('should login with valid credentials @logged', async () => {
-    const { resLogin, jsonLogin } = await authApi.login(testUser1);
+    const { resLogin, jsonLogin } = await authApi.login(testUserApi);
 
     expectStatusOK(resLogin);
     expectSuccess(jsonLogin);
@@ -24,7 +24,7 @@ test.describe('Login API', () => {
 
   test('should not login with incorrect credentials @logged', async () => {
     const expectedErrorMessage = 'Invalid credentials';
-    const { resLogin, jsonLogin } = await authApi.login(testUserIncorrect);
+    const { resLogin, jsonLogin } = await authApi.login(testUserIncorrectApi);
 
     expect(resLogin.status()).toBe(HTTP_STATUS.UNAUTHORIZED);
     expect(jsonLogin).toHaveProperty('error.message', expectedErrorMessage);

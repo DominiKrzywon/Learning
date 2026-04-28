@@ -1,15 +1,15 @@
 import { expect, test } from '@_src/merge.fixture';
 import {
-  testUserInvalidPassword,
-  testUserInvalidUsername,
-  testUserLearning,
-} from '@_src/ui/test-data/user.data';
+  testUserInvalidPasswordUI,
+  testUserInvalidUsernameUI,
+  testUserLearningUI,
+} from '@_src/test-data/user.data';
 
 test.describe('Tests for login', () => {
   test('AUTH-001 should login with valid credentials', async ({
     loginPage,
   }) => {
-    const dashboard = await loginPage.login(testUserLearning);
+    const dashboard = await loginPage.login(testUserLearningUI);
     await dashboard.waitForPageToLoadUrl();
 
     await expect(dashboard.courseList).toBeVisible();
@@ -18,7 +18,7 @@ test.describe('Tests for login', () => {
   test('AUTH-002 should not login with invalid password', async ({
     loginPage,
   }) => {
-    await loginPage.login(testUserInvalidPassword);
+    await loginPage.login(testUserInvalidPasswordUI);
 
     await expect(loginPage.errorMessage).toBeVisible();
   });
@@ -26,7 +26,7 @@ test.describe('Tests for login', () => {
   test('AUTH-003 should not login with invalid username', async ({
     loginPage,
   }) => {
-    await loginPage.login(testUserInvalidUsername);
+    await loginPage.login(testUserInvalidUsernameUI);
 
     await expect(loginPage.errorMessage).toBeVisible();
   });

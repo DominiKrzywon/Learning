@@ -9,7 +9,7 @@ import {
 } from '@_src/schemas/course.schema';
 import { CourseProgressResponseSchema } from '@_src/schemas/progress.schema';
 import { courseData } from '@_src/test-data/course.data';
-import { testUser1 } from '@_src/test-data/user.data';
+import { testUserApi } from '@_src/test-data/user.data';
 import { expectStatusOK, expectSuccess } from '@_src/utils/assertions';
 import { HTTP_STATUS } from '@_src/utils/http-status';
 
@@ -94,7 +94,7 @@ test.describe('Courses API', () => {
   });
 
   test('should not display progress for unauthorized user @logged', async () => {
-    const { resLogin, jsonLogin } = await authApi.login(testUser1);
+    const { resLogin, jsonLogin } = await authApi.login(testUserApi);
     const { resGetProgress } = await courseApi.getProgress(courseId);
 
     expectSuccess(jsonLogin);

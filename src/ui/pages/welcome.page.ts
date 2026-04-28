@@ -1,4 +1,5 @@
 import { BasePage } from '@_src/ui/pages/base.page';
+import { LoginPage } from '@_src/ui/pages/login.page';
 import { Page } from '@playwright/test';
 
 export class WelcomePage extends BasePage {
@@ -11,9 +12,9 @@ export class WelcomePage extends BasePage {
     super(page);
   }
 
-  async login(): Promise<WelcomePage> {
+  async openLogin(): Promise<LoginPage> {
     await this.goToLogin.click();
 
-    return new WelcomePage(this.page);
+    return new LoginPage(this.page);
   }
 }
