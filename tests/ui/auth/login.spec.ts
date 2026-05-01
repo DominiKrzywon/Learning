@@ -33,10 +33,10 @@ test.describe('Tests for login', () => {
 
   test('AUTH-004 should logout from dashboard @logged', async ({
     dashboardPage,
+    welcomePage,
   }) => {
-    const welcomePage = await dashboardPage.logout();
+    await dashboardPage.logout();
     await welcomePage.waitForPageToLoadUrl();
-
     await expect(welcomePage.logo).toBeVisible();
   });
 

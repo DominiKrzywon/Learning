@@ -16,15 +16,15 @@ export class AccountSettingsPage extends BasePage {
     .filter({ hasText: 'Successfully added' });
 
   // update profile
-  profileFirstName = this.page.locator('.firstName');
-  profileLastName = this.page.locator('.lastName');
-  profileEmail = this.page.locator('.email');
-  profileUpdateCurrentPassword = this.page.locator('.confirmProfilePassword');
+  profileFirstName = this.page.locator('#firstName');
+  profileLastName = this.page.locator('#lastName');
+  profileEmail = this.page.locator('#email');
+  profileUpdateCurrentPassword = this.page.locator('#confirmProfilePassword');
   profileUpdateButton = this.page.getByRole('button', {
     name: 'Update Profile',
   });
   profileUpdateSuccess = this.page
-    .locator('.notification.success')
+    .locator('.notification.info')
     .filter({ hasText: 'Profile updated successfully! Please sign in again.' });
   profileUpdateError = this.page
     .locator('.notification.error')
@@ -36,7 +36,7 @@ export class AccountSettingsPage extends BasePage {
   changePasswordConfirm = this.page.locator('#confirmPassword');
   changePasswordButton = this.page.locator('#changePasswordBtn');
   changePasswordSuccess = this.page
-    .locator('.notification.success')
+    .locator('.notification.info')
     .filter({ hasText: 'Password changed successfully!' });
   changePasswordError = this.page
     .locator('.notification.error')
@@ -46,6 +46,13 @@ export class AccountSettingsPage extends BasePage {
   deactivatePasswordInput = this.page.locator('#deactivatePassword');
   deactivateConfirmCheckbox = this.page.locator('#deactivateConfirm');
   deactivateButton = this.page.locator('#deactivateAccountBtn');
+  deactivateModalButton = this.page.getByRole('button', {
+    name: 'Deactivate',
+    exact: true,
+  });
+  deactivateSuccessMessage = this.page
+    .locator('.notification.info')
+    .filter({ hasText: 'Account deactivated successfully. Redirecting...' });
 
   constructor(page: Page) {
     super(page);
@@ -106,7 +113,7 @@ export class AccountSettingsPage extends BasePage {
     firstName?: string;
     lastName?: string;
     email?: string;
-    password?: string;
+    currentPassword?: string;
   }) {
     if (data.firstName) {
       await this.profileFirstName.fill(data.firstName);
@@ -117,8 +124,8 @@ export class AccountSettingsPage extends BasePage {
     if (data.email) {
       await this.profileEmail.fill(data.email);
     }
-    if (data.password) {
-      await this.profileUpdateCurrentPassword.fill(data.password);
+    if (data.currentPassword) {
+      await this.profileUpdateCurrentPassword.fill(data.currentPassword);
     }
 
     await this.profileUpdateButton.click();
@@ -138,5 +145,6 @@ export class AccountSettingsPage extends BasePage {
     await this.deactivatePasswordInput.fill(currentPassword);
     await this.deactivateConfirmCheckbox.check();
     await this.deactivateButton.click();
+    await this.deactivateModalButton.click();
   }
 }
