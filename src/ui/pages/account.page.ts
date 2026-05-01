@@ -36,7 +36,7 @@ export class AccountSettingsPage extends BasePage {
   changePasswordConfirm = this.page.locator('#confirmPassword');
   changePasswordButton = this.page.locator('#changePasswordBtn');
   changePasswordSuccess = this.page
-    .locator('notification.success')
+    .locator('.notification.success')
     .filter({ hasText: 'Password changed successfully!' });
   changePasswordError = this.page
     .locator('.notification.error')
