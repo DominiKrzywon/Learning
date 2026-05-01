@@ -8,7 +8,8 @@ export class LoginPage extends BasePage {
   username = this.page.locator('#usernameInput');
   password = this.page.locator('#passwordInput');
   signInButton = this.page.getByRole('button', { name: 'Sign In' });
-
+  returnButton = this.page.locator('.return-button');
+  pageHeading = this.page.getByRole('heading', { name: 'Sign In' });
   errorMessage = this.page.getByText(
     'Login failed. Invalid username or password',
   );

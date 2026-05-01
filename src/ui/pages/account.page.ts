@@ -15,6 +15,38 @@ export class AccountSettingsPage extends BasePage {
     .locator('.notification.success')
     .filter({ hasText: 'Successfully added' });
 
+  // update profile
+  profileFirstName = this.page.locator('.firstName');
+  profileLastName = this.page.locator('.lastName');
+  profileEmail = this.page.locator('.email');
+  profileUpdateCurrentPassword = this.page.locator('.confirmProfilePassword');
+  profileUpdateButton = this.page.getByRole('button', {
+    name: 'Update Profile',
+  });
+  profileUpdateSuccess = this.page
+    .locator('.notification.success')
+    .filter({ hasText: 'Profile updated successfully! Please sign in again.' });
+  profileUpdateError = this.page
+    .locator('.notification.error')
+    .filter({ hasText: 'Please enter your current password' });
+
+  // change password
+  changePasswordCurrent = this.page.locator('#changePasswordCurrentPassword');
+  changePasswordNew = this.page.locator('#newPassword');
+  changePasswordConfirm = this.page.locator('#confirmPassword');
+  changePasswordButton = this.page.locator('#changePasswordBtn');
+  changePasswordSuccess = this.page
+    .locator('notification.success')
+    .filter({ hasText: 'Password changed successfully!' });
+  changePasswordError = this.page
+    .locator('.notification.error')
+    .filter({ hasText: 'Current password is incorrect' });
+
+  // deactivate
+  deactivatePasswordInput = this.page.locator('#deactivatePassword');
+  deactivateConfirmCheckbox = this.page.locator('#deactivateConfirm');
+  deactivateButton = this.page.locator('#deactivateAccountBtn');
+
   constructor(page: Page) {
     super(page);
   }
@@ -68,5 +100,43 @@ export class AccountSettingsPage extends BasePage {
     const after = await this.getFundsValue();
 
     return { before, after };
+  }
+
+  async updateProfile(data: {
+    firstName?: string;
+    lastName?: string;
+    email?: string;
+    password?: string;
+  }) {
+    if (data.firstName) {
+      await this.profileFirstName.fill(data.firstName);
+    }
+    if (data.lastName) {
+      await this.profileLastName.fill(data.lastName);
+    }
+    if (data.email) {
+      await this.profileEmail.fill(data.email);
+    }
+    if (data.password) {
+      await this.profileUpdateCurrentPassword.fill(data.password);
+    }
+
+    await this.profileUpdateButton.click();
+  }
+
+  async changePassword(
+    currentPassword: string,
+    newPassword: string,
+  ): Promise<void> {
+    await this.changePasswordCurrent.fill(currentPassword);
+    await this.changePasswordNew.fill(newPassword);
+    await this.changePasswordConfirm.fill(newPassword);
+    await this.changePasswordButton.click();
+  }
+
+  async deactivateAccount(currentPassword: string): Promise<void> {
+    await this.deactivatePasswordInput.fill(currentPassword);
+    await this.deactivateConfirmCheckbox.check();
+    await this.deactivateButton.click();
   }
 }
