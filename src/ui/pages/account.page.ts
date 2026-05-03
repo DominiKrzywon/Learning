@@ -54,6 +54,15 @@ export class AccountSettingsPage extends BasePage {
     .locator('.notification.info')
     .filter({ hasText: 'Account deactivated successfully. Redirecting...' });
 
+  // privacy /public profile
+  profileVisibilityPassword = this.page.locator('#profileVisibilityPassword');
+  isPublicProfile = this.page.locator('#isPublicProfile');
+  currentVisibilityStatus = this.page.locator('#visibilityStatus');
+  viewPublicProfileLink = this.page.locator('#viewPublicProfile');
+  privacySuccess = this.page
+    .locator('.notification.info')
+    .filter({ hasText: 'Profile visibility updated successfully' });
+
   constructor(page: Page) {
     super(page);
   }
@@ -139,6 +148,11 @@ export class AccountSettingsPage extends BasePage {
     await this.changePasswordNew.fill(newPassword);
     await this.changePasswordConfirm.fill(newPassword);
     await this.changePasswordButton.click();
+  }
+
+  async setProfileVisibility(password: string): Promise<void> {
+    await this.profileVisibilityPassword.fill(password);
+    await this.isPublicProfile.click();
   }
 
   async deactivateAccount(currentPassword: string): Promise<void> {

@@ -7,7 +7,7 @@ import { courseData } from '@_src/test-data/course.data';
 
 const courseId = courseData.defaultCourseId;
 
-test.describe('Test for enrollment', () => {
+test.describe('Tests for course viewer', () => {
   let authHeader: string;
   let userId: number;
 
@@ -27,7 +27,7 @@ test.describe('Test for enrollment', () => {
     await courseViewerPage.goto('?id=1&lesson=1');
   });
 
-  test('COURSE-001 verify if marking lesson as complete shows success notification', async ({
+  test('COURSE-001 verify if marking lesson as complete shows success notification @integration', async ({
     courseViewerPage,
   }) => {
     const lessonCompletedMessage = 'Lesson completed successfully!';
@@ -38,7 +38,7 @@ test.describe('Test for enrollment', () => {
     );
   });
 
-  test('COURSE-002 verify if marking lesson as complete shows success notification', async ({
+  test('COURSE-002 verify if marking lesson as complete shows success notification @e2e', async ({
     page,
     courseViewerPage,
   }) => {

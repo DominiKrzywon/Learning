@@ -6,7 +6,7 @@ import {
 } from '@_src/test-data/user.data';
 
 test.describe('Tests for login', () => {
-  test('AUTH-001 should login with valid credentials', async ({
+  test('AUTH-001 should login with valid credentials @smoke', async ({
     loginPage,
   }) => {
     const dashboard = await loginPage.login(testUserLearningUI);
@@ -15,7 +15,7 @@ test.describe('Tests for login', () => {
     await expect(dashboard.courseList).toBeVisible();
   });
 
-  test('AUTH-002 should not login with invalid password', async ({
+  test('AUTH-002 should not login with invalid password @smoke', async ({
     loginPage,
   }) => {
     await loginPage.login(testUserInvalidPasswordUI);
@@ -23,7 +23,7 @@ test.describe('Tests for login', () => {
     await expect(loginPage.errorMessage).toBeVisible();
   });
 
-  test('AUTH-003 should not login with invalid username', async ({
+  test('AUTH-003 should not login with invalid username @smoke', async ({
     loginPage,
   }) => {
     await loginPage.login(testUserInvalidUsernameUI);
@@ -31,7 +31,7 @@ test.describe('Tests for login', () => {
     await expect(loginPage.errorMessage).toBeVisible();
   });
 
-  test('AUTH-004 should logout from dashboard @logged', async ({
+  test('AUTH-004 should logout from dashboard @logged @integration', async ({
     dashboardPage,
     welcomePage,
   }) => {
@@ -40,7 +40,7 @@ test.describe('Tests for login', () => {
     await expect(welcomePage.logo).toBeVisible();
   });
 
-  test('AUTH-005 should cannot take lesson without login @non-logged', async ({
+  test('AUTH-005 should cannot take lesson without login @non-logged @integration', async ({
     dashboardPage,
   }) => {
     await dashboardPage.goto();
@@ -48,7 +48,7 @@ test.describe('Tests for login', () => {
     await expect(dashboardPage.myCourses).toHaveClass(/disabled-link/);
   });
 
-  test('AUTH-006 verify if session persists after page refresh @logged', async ({
+  test('AUTH-006 verify if session persists after page refresh @logged @integration', async ({
     dashboardPage,
   }) => {
     await dashboardPage.goto();

@@ -13,7 +13,7 @@ test.describe('Tests for enrollment', () => {
     await loginPage.login({ username, password });
   });
 
-  test('ENROLL-001 verify if auth user can enroll on course', async ({
+  test('ENROLL-001 verify if auth user can enroll on course @integration', async ({
     courseDetailsPage,
     courseViewerPage,
   }) => {
@@ -25,7 +25,7 @@ test.describe('Tests for enrollment', () => {
     await expect(courseDetailsPage.enrollButton).not.toBeVisible();
   });
 
-  test('ENROLL-002 verify if enrolled course appears on dashboard', async ({
+  test('ENROLL-002 verify if enrolled course appears on dashboard @integration', async ({
     courseDetailsPage,
     dashboardPage,
   }) => {
@@ -38,7 +38,7 @@ test.describe('Tests for enrollment', () => {
     ).toBeVisible();
   });
 
-  test('ENROLL-003 verify access restriction without enrollment', async ({
+  test('ENROLL-003 verify access restriction without enrollment @integration', async ({
     dashboardPage,
   }) => {
     await dashboardPage.goto();
@@ -49,7 +49,7 @@ test.describe('Tests for enrollment', () => {
     );
   });
 
-  test('ENROLL-004 verify if user with funds can enroll from dashboard', async ({
+  test('ENROLL-004 verify if user with funds can enroll from dashboard @integration', async ({
     accountSettingsPage,
     dashboardPage,
     courseViewerPage,

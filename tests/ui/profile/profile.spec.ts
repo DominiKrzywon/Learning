@@ -27,7 +27,7 @@ test.describe('Test for user profile', () => {
     await accountSettingsPage.goto();
   });
 
-  test('PROFILE-001 verify redirect after update profile', async ({
+  test('PROFILE-001 verify redirect after update profile e2e', async ({
     accountSettingsPage,
     loginPage,
     page,
@@ -49,7 +49,7 @@ test.describe('Test for user profile', () => {
     await expect(accountSettingsPage.profileUpdateSuccess).toBeVisible();
   });
 
-  test('PROFILE-002 verify successfully change password', async ({
+  test('PROFILE-002 verify successfully change password e2e', async ({
     accountSettingsPage,
     dashboardPage,
     welcomePage,
@@ -71,7 +71,7 @@ test.describe('Test for user profile', () => {
     await expect(dashboardPage.courseList).toBeVisible();
   });
 
-  test('PROFILE-003 verify error message with wrong password', async ({
+  test('PROFILE-003 verify error message with wrong password @integration', async ({
     accountSettingsPage,
   }) => {
     const newPassword = faker.internet.password();
@@ -80,7 +80,7 @@ test.describe('Test for user profile', () => {
     await expect(accountSettingsPage.changePasswordError).toBeVisible();
   });
 
-  test('PROFILE-004 verify account deactivation', async ({
+  test('PROFILE-004 verify account deactivation e2e', async ({
     accountSettingsPage,
     welcomePage,
     loginPage,
