@@ -1,4 +1,3 @@
-import { AuthApi } from '@_src/api/auth.api';
 import { UserApi } from '@_src/api/user.api';
 import { loginAndGetUser } from '@_src/helper/auth';
 import { restoreSystem } from '@_src/helper/restore';
@@ -8,7 +7,6 @@ import {
   invalid_password,
   userProfileData,
 } from '@_src/test-data/user.profile.data';
-import { HTTP_STATUS } from '@_src/utils/http-status';
 import { faker } from '@faker-js/faker';
 
 test.describe('Test for user profile', () => {
@@ -53,17 +51,24 @@ test.describe('Test for user profile', () => {
 
   test('PROFILE-002 verify successfully change password', async ({
     accountSettingsPage,
-    page,
+    dashboardPage,
+    welcomePage,
+    loginPage,
   }) => {
     const newPassword = faker.internet.password();
     await accountSettingsPage.changePassword(password, newPassword);
-
     await expect(accountSettingsPage.changePasswordSuccess).toBeVisible();
-    await accountSettingsPage.logout();
 
-    const authApi = new AuthApi(page.request);
-    const { resLogin } = await authApi.login({ username, password });
-    expect(resLogin.status()).toBe(HTTP_STATUS.UNAUTHORIZED);
+    await accountSettingsPage.logout();
+    await welcomePage.waitForPageToLoadUrl();
+    await loginPage.goto();
+    await loginPage.login({ username, password });
+
+    await expect(loginPage.errorMessage).toBeVisible();
+
+    await loginPage.login({ username, password: newPassword });
+
+    await expect(dashboardPage.courseList).toBeVisible();
   });
 
   test('PROFILE-003 verify error message with wrong password', async ({
