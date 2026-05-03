@@ -8,4 +8,4 @@ export function userProfileData(currentPassword: string) {
   } as const;
 }
 
-export const invalid_password = 'badPassword123'
+export const invalidPassword = 'badPassword123';

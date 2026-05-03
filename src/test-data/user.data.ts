@@ -18,7 +18,7 @@ export const testUserLearningUI: LoginUserModel = {
 
 export const testUserInvalidPasswordUI: LoginUserModel = {
   username: USER_NAME,
-  password: 'invalid_password',
+  password: 'invalidPassword',
 };
 
 export const testUserInvalidUsernameUI: LoginUserModel = {

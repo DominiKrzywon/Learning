@@ -3,7 +3,7 @@ import { UserApi } from '@_src/api/user.api';
 import { expect, test } from '@_src/fixtures/user.fixture';
 import { restoreSystem } from '@_src/helper/restore';
 import {
-  invalid_password,
+  invalidPassword,
   userProfileData,
 } from '@_src/test-data/user.profile.data';
 import {
@@ -97,7 +97,7 @@ test.describe('REQ-011 User Profile Management', () => {
     userApi = new UserApi(request, authHeader);
 
     const badPassword = {
-      currentPassword: invalid_password,
+      currentPassword: invalidPassword,
       newPassword: faker.internet.password(),
     };
 

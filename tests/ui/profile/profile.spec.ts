@@ -4,7 +4,7 @@ import { restoreSystem } from '@_src/helper/restore';
 import { createUserAndLogin } from '@_src/helper/user';
 import { expect, test } from '@_src/merge.fixture';
 import {
-  invalid_password,
+  invalidPassword,
   userProfileData,
 } from '@_src/test-data/user.profile.data';
 import { faker } from '@faker-js/faker';
@@ -34,6 +34,8 @@ test.describe('Test for user profile', () => {
   }) => {
     await accountSettingsPage.updateProfile(userProfileData(password));
 
+    await expect(accountSettingsPage.profileUpdateSuccess).toBeVisible();
+
     await loginPage.waitForPageToLoadUrl();
     const newLogin = await loginAndGetUser(page.request, {
       username,
@@ -46,7 +48,6 @@ test.describe('Test for user profile', () => {
     ).getProfile(newLogin.userId);
 
     expect(jsonGetProfile.email).toBe(userProfileData(password).email);
-    await expect(accountSettingsPage.profileUpdateSuccess).toBeVisible();
   });
 
   test('PROFILE-002 verify successfully change password e2e', async ({
@@ -55,6 +56,7 @@ test.describe('Test for user profile', () => {
     welcomePage,
     loginPage,
   }) => {
+    const expectedErrorMessage = 'Login failed. Invalid username or password';
     const newPassword = faker.internet.password();
     await accountSettingsPage.changePassword(password, newPassword);
     await expect(accountSettingsPage.changePasswordSuccess).toBeVisible();
@@ -64,7 +66,7 @@ test.describe('Test for user profile', () => {
     await loginPage.goto();
     await loginPage.login({ username, password });
 
-    await expect(loginPage.errorMessage).toBeVisible();
+    await expect(loginPage.errorMessage).toHaveText(expectedErrorMessage);
 
     await loginPage.login({ username, password: newPassword });
 
@@ -75,7 +77,7 @@ test.describe('Test for user profile', () => {
     accountSettingsPage,
   }) => {
     const newPassword = faker.internet.password();
-    await accountSettingsPage.changePassword(invalid_password, newPassword);
+    await accountSettingsPage.changePassword(invalidPassword, newPassword);
 
     await expect(accountSettingsPage.changePasswordError).toBeVisible();
   });

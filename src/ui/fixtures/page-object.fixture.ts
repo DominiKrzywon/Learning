@@ -2,6 +2,7 @@ import { AccountSettingsPage } from '@_src/ui/pages/account.page';
 import { CourseViewerPage } from '@_src/ui/pages/course-viewer.page';
 import { CourseDetailsPage } from '@_src/ui/pages/course.page';
 import { DashboardPage } from '@_src/ui/pages/dashboard.page';
+import { InstructorPage } from '@_src/ui/pages/instructor-profile.page';
 import { LoginPage } from '@_src/ui/pages/login.page';
 import { PreviewPage } from '@_src/ui/pages/preview.page';
 import { WelcomePage } from '@_src/ui/pages/welcome.page';
@@ -15,6 +16,7 @@ interface Pages {
   courseViewerPage: CourseViewerPage;
   accountSettingsPage: AccountSettingsPage;
   previewPage: PreviewPage;
+  instructorPage: InstructorPage;
 }
 
 export const pageObjectTest = baseTest.extend<Pages>({
@@ -53,5 +55,10 @@ export const pageObjectTest = baseTest.extend<Pages>({
   previewPage: async ({ page }, use) => {
     const previewPage = new PreviewPage(page);
     await use(previewPage);
+  },
+
+  instructorPage: async ({ page }, use) => {
+    const instructorPage = new InstructorPage(page);
+    await use(instructorPage);
   },
 });

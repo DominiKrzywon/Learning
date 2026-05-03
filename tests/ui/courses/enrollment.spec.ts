@@ -36,6 +36,7 @@ test.describe('Tests for enrollment', () => {
     await expect(
       dashboardPage.getCourse(courseData.fourthCourseId),
     ).toBeVisible();
+    await expect(courseDetailsPage.enrollButton).not.toBeVisible();
   });
 
   test('ENROLL-003 verify access restriction without enrollment @integration', async ({
