@@ -7,6 +7,7 @@ test.describe('Free Demo Preview', () => {
     instructorPage,
     welcomePage,
     page,
+    courseViewerPage,
   }) => {
     const expectedBannerText =
       'Preview Mode - Sign in to access full course content';
@@ -23,6 +24,9 @@ test.describe('Free Demo Preview', () => {
       await expect(previewPage.lockLessons).toBeVisible();
       await expect(previewPage.signInToTrackProgress).toBeVisible();
       await expect(previewPage.signInCta).toBeVisible();
+      await expect(
+        courseViewerPage.lessonCompletedNotification,
+      ).not.toBeVisible();
     });
 
     await test.step('verify Sign In redirects to login', async () => {

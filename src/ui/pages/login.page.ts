@@ -21,7 +21,7 @@ export class LoginPage extends BasePage {
   async login(loginUserData: LoginUserModel): Promise<DashboardPage> {
     await this.username.fill(loginUserData.username);
     await this.password.fill(loginUserData.password);
-    await this.signInButton.click();
+    await this.signInButtonLoginPage.click();
 
     return new DashboardPage(this.page);
   }

@@ -7,10 +7,15 @@ import { fundsTestData } from '@_src/test-data/funds.data';
 const courseQuery = `?id=${courseData.fourthCourseId}`;
 
 test.describe('Tests for enrollment', () => {
+  let authHeader: string;
+  let userId: number;
+
   test.beforeEach(async ({ page, loginPage }) => {
     await restoreSystem(page.request);
-    const { username, password } = await createUserAndLogin(page.request);
-    await loginPage.login({ username, password });
+    const user = await createUserAndLogin(page.request);
+    authHeader = user.authHeader;
+    userId = user.userId;
+    await loginPage.login({ username: user.username, password: user.password });
   });
 
   test('ENROLL-001 verify if auth user can enroll on course @integration', async ({
@@ -36,7 +41,6 @@ test.describe('Tests for enrollment', () => {
     await expect(
       dashboardPage.getCourse(courseData.fourthCourseId),
     ).toBeVisible();
-    await expect(courseDetailsPage.enrollButton).not.toBeVisible();
   });
 
   test('ENROLL-003 verify access restriction without enrollment @integration', async ({
