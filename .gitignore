@@ -10,3 +10,4 @@ tmp/*
 !tmp/.gitkeep
 .instructions.md
 /refactor.md
+learning-notes/
