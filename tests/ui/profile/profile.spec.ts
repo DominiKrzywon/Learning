@@ -22,19 +22,24 @@ test.describe('Test for user profile', () => {
     userId = user.userId;
     username = user.username;
     password = user.password;
+    await loginPage.goto();
     await loginPage.login({ username: user.username, password: user.password });
     await page.waitForURL('**/dashboard.html');
     await accountSettingsPage.goto();
   });
 
-  test('PROFILE-001 verify redirect after update profile e2e', async ({
+  test('should redirect to login after updating profile @e2e', async ({
     accountSettingsPage,
     loginPage,
     page,
   }) => {
+    const successMessage =
+      'Profile updated successfully! Please sign in again.';
     await accountSettingsPage.updateProfile(userProfileData(password));
 
-    await expect(accountSettingsPage.profileUpdateSuccess).toBeVisible();
+    await expect(accountSettingsPage.profileUpdateSuccess).toHaveText(
+      successMessage,
+    );
 
     await loginPage.waitForPageToLoadUrl();
     const newLogin = await loginAndGetUser(page.request, {
@@ -50,45 +55,63 @@ test.describe('Test for user profile', () => {
     expect(jsonGetProfile.email).toBe(userProfileData(password).email);
   });
 
-  test('PROFILE-002 verify successfully change password e2e', async ({
+  test('should successfully change password @e2e', async ({
     accountSettingsPage,
     dashboardPage,
     welcomePage,
     loginPage,
   }) => {
+    const expectedSuccessMessage = 'Password changed successfully!';
     const expectedErrorMessage = 'Login failed. Invalid username or password';
     const newPassword = faker.internet.password();
-    await accountSettingsPage.changePassword(password, newPassword);
-    await expect(accountSettingsPage.changePasswordSuccess).toBeVisible();
 
-    await accountSettingsPage.logout();
-    await welcomePage.waitForPageToLoadUrl();
-    await loginPage.goto();
-    await loginPage.login({ username, password });
+    await test.step('change password', async () => {
+      await accountSettingsPage.changePassword(password, newPassword);
+      await expect(accountSettingsPage.changePasswordSuccess).toHaveText(
+        expectedSuccessMessage,
+      );
+    });
 
-    await expect(loginPage.errorMessage).toHaveText(expectedErrorMessage);
+    await test.step('verify if old password is invalid', async () => {
+      await accountSettingsPage.logout();
+      await welcomePage.waitForPageToLoadUrl();
+      await loginPage.goto();
+      await loginPage.login({ username, password });
 
-    await loginPage.login({ username, password: newPassword });
+      await expect(loginPage.errorMessage).toHaveText(expectedErrorMessage);
+    });
 
-    await expect(dashboardPage.courseList).toBeVisible();
+    await test.step('login with new password', async () => {
+      await loginPage.login({ username, password: newPassword });
+
+      await expect(dashboardPage.courseList).toBeVisible();
+    });
   });
 
-  test('PROFILE-003 verify error message with wrong password @integration', async ({
+  test('should show error when changing password with wrong current password @smoke', async ({
     accountSettingsPage,
   }) => {
+    const errorMessage = 'Current password is incorrect';
     const newPassword = faker.internet.password();
     await accountSettingsPage.changePassword(invalidPassword, newPassword);
 
-    await expect(accountSettingsPage.changePasswordError).toBeVisible();
+    await expect(accountSettingsPage.changePasswordError).toHaveText(
+      errorMessage,
+    );
   });
 
-  test('PROFILE-004 verify account deactivation e2e', async ({
+  test('should deactivate account and block further login @e2e', async ({
     accountSettingsPage,
     welcomePage,
     loginPage,
   }) => {
+    const expectedSuccessMessage =
+      'Account deactivated successfully. Redirecting...';
+
     await accountSettingsPage.deactivateAccount(password);
-    await expect(accountSettingsPage.deactivateSuccessMessage).toBeVisible();
+    await expect(accountSettingsPage.deactivateSuccessMessage).toHaveText(
+      expectedSuccessMessage,
+    );
 
     await welcomePage.waitForPageToLoadUrl();
 
@@ -96,6 +119,19 @@ test.describe('Test for user profile', () => {
 
     await loginPage.goto();
     await loginPage.login({ username, password });
-    await expect(loginPage.errorMessage).toBeVisible();
+    await expect(loginPage.errorMessage).toHaveText(
+      'Login failed. Invalid username or password',
+    );
+  });
+
+  test('should show error when update profile with empty inputs @smoke', async ({
+    accountSettingsPage,
+  }) => {
+    const expectedErrorMessage = 'Please enter your current password';
+    await accountSettingsPage.profileUpdateButton.click();
+
+    await expect(accountSettingsPage.profileUpdateError).toHaveText(
+      expectedErrorMessage,
+    );
   });
 });

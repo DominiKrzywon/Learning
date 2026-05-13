@@ -37,6 +37,9 @@ export const apiUrls = {
   deactivateUserUrl: (userId: number) =>
     `/api/learning/users/${userId}/deactivate`,
 
+  userEnrollmentsUrl: (userId: number | null) =>
+    `/api/learning/users/${userId}/enrollments`,
+
   // REQ-007 Funds endpoints
   getUserFundsUrl: (userId: number) => `/api/learning/users/${userId}/funds`,
   putUserFundsUrl: (userId: number) => `/api/learning/users/${userId}/funds`,

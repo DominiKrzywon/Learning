@@ -9,6 +9,7 @@ import { Page } from '@playwright/test';
 export class AccountSettingsPage extends BasePage {
   url = 'learning/account.html';
 
+  // account balance
   topUpButton = this.page.locator('#topUpBtn');
   fundsAmount = this.page.locator('.funds-amount');
   topUpSuccessNotification = this.page
@@ -23,12 +24,9 @@ export class AccountSettingsPage extends BasePage {
   profileUpdateButton = this.page.getByRole('button', {
     name: 'Update Profile',
   });
-  profileUpdateSuccess = this.page
-    .locator('.notification.info')
-    .filter({ hasText: 'Profile updated successfully! Please sign in again.' });
-  profileUpdateError = this.page
-    .locator('.notification.error')
-    .filter({ hasText: 'Please enter your current password' });
+  profileUpdateSuccess = this.page.locator('.notification.info');
+
+  profileUpdateError = this.page.locator('.notification.error');
 
   // change password
   changePasswordCurrent = this.page.locator('#changePasswordCurrentPassword');
@@ -37,7 +35,7 @@ export class AccountSettingsPage extends BasePage {
   changePasswordButton = this.page.locator('#changePasswordBtn');
   changePasswordSuccess = this.page
     .locator('.notification.info')
-    .filter({ hasText: 'Password changed successfully!' });
+
   changePasswordError = this.page
     .locator('.notification.error')
     .filter({ hasText: 'Current password is incorrect' });

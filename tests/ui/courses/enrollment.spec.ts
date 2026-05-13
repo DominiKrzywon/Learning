@@ -22,10 +22,11 @@ test.describe('Tests for enrollment', () => {
     const user = await createUserAndLogin(page.request);
     authHeader = user.authHeader;
     userId = user.userId;
+    loginPage.goto();
     await loginPage.login({ username: user.username, password: user.password });
   });
 
-  test('ENROLL-001 should enroll user from course details @e2e', async ({
+  test('should enroll user from course details @e2e', async ({
     page,
     courseDetailsPage,
     courseViewerPage,
@@ -67,7 +68,7 @@ test.describe('Tests for enrollment', () => {
     expect(parsed.success).toBe(true);
   });
 
-  test('ENROLL-002 should show enrolled course on dashboard @e2e', async ({
+  test('should show enrolled course on dashboard @e2e', async ({
     courseDetailsPage,
     dashboardPage,
     page,
@@ -94,7 +95,7 @@ test.describe('Tests for enrollment', () => {
     expect(parsed.success).toBe(true);
   });
 
-  test('ENROLL-003 should reject dashboard enrollment with insufficient funds @integration', async ({
+  test('should reject dashboard enrollment with insufficient funds @e2e', async ({
     dashboardPage,
     page,
   }) => {
@@ -114,7 +115,7 @@ test.describe('Tests for enrollment', () => {
     expect(resGetProgress.status()).toBe(HTTP_STATUS.FORBIDDEN);
   });
 
-  test('ENROLL-004 should allow dashboard enrollment after top-up @integration', async ({
+  test('should allow dashboard enrollment after top-up @e2e', async ({
     accountSettingsPage,
     dashboardPage,
     courseViewerPage,
