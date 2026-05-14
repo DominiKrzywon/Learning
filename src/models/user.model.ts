@@ -3,6 +3,10 @@ export interface LoginUserModel {
   password: string;
 }
 
+export interface LoginUserModelWithName extends LoginUserModel {
+  displayName: string;
+}
+
 export interface RegisterUserModel {
   username: string;
   password: string;

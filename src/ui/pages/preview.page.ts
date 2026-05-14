@@ -9,4 +9,5 @@ export class PreviewPage extends BasePage {
     name: /More Lessons Available/i,
   });
   instructorLink = this.page.getByLabel('Instructor');
+  createAccount = this.page.getByLabel('Create Account');
 }

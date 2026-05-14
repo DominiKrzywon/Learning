@@ -5,6 +5,7 @@ import { DashboardPage } from '@_src/ui/pages/dashboard.page';
 import { InstructorPage } from '@_src/ui/pages/instructor-profile.page';
 import { LoginPage } from '@_src/ui/pages/login.page';
 import { PreviewPage } from '@_src/ui/pages/preview.page';
+import { RegisterPage } from '@_src/ui/pages/register.page';
 import { WelcomePage } from '@_src/ui/pages/welcome.page';
 import { test as baseTest } from '@playwright/test';
 
@@ -17,6 +18,7 @@ interface Pages {
   accountSettingsPage: AccountSettingsPage;
   previewPage: PreviewPage;
   instructorPage: InstructorPage;
+  registerPage: RegisterPage;
 }
 
 export const pageObjectTest = baseTest.extend<Pages>({
@@ -60,5 +62,10 @@ export const pageObjectTest = baseTest.extend<Pages>({
   instructorPage: async ({ page }, use) => {
     const instructorPage = new InstructorPage(page);
     await use(instructorPage);
+  },
+
+  registerPage: async ({ page }, use) => {
+    const registerPage = new RegisterPage(page);
+    await use(registerPage);
   },
 });

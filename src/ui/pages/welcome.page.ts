@@ -7,6 +7,7 @@ export class WelcomePage extends BasePage {
   goToLogin = this.page.getByRole('link', { name: 'Sign In' });
   logo = this.page.getByLabel('GAD Learning');
   demo = this.page.getByLabel('Demo');
+  header = this.page.getByRole('heading', { name: 'Start Learning Today' });
 
   constructor(page: Page) {
     super(page);

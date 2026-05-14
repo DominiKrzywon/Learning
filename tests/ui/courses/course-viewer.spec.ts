@@ -4,6 +4,9 @@ import { restoreSystem } from '@_src/helper/restore';
 import { createUserAndLogin } from '@_src/helper/user';
 import { expect, test } from '@_src/merge.fixture';
 import { courseData } from '@_src/test-data/course.data';
+import { waitForResponse } from '@_src/ui/utils/wait.util';
+import { apiUrls } from '@_src/utils/api.util';
+import { HTTP_STATUS } from '@_src/utils/http-status';
 
 const courseId = courseData.defaultCourseId;
 
@@ -27,7 +30,7 @@ test.describe('Tests for course viewer', () => {
     await courseViewerPage.goto('?id=1&lesson=1');
   });
 
-  test('COURSE-001 verify if marking lesson as complete shows success notification @integration', async ({
+  test('verify if marking lesson as complete shows success notification @integration', async ({
     courseViewerPage,
   }) => {
     const lessonCompletedMessage = 'Lesson completed successfully!';
@@ -38,7 +41,7 @@ test.describe('Tests for course viewer', () => {
     );
   });
 
-  test('COURSE-002 verify if marking lesson as complete shows success notification @e2e', async ({
+  test('verify if marking lesson as complete shows success notification @e2e', async ({
     page,
     courseViewerPage,
   }) => {
@@ -59,4 +62,30 @@ test.describe('Tests for course viewer', () => {
       ]),
     );
   });
+});
+
+test.describe('negative scenario for non logged user', () => {
+  test(
+    'verify if no-logged user cannot open a lesson',
+    { tag: ['@smoke', '@non-logged'] },
+    async ({ courseViewerPage, welcomePage, page }) => {
+      const id = '?id=1&lesson=1';
+
+      const [response] = await Promise.all([
+        waitForResponse(
+          page,
+          apiUrls.userEnrollmentsUrl(null),
+          'GET',
+          HTTP_STATUS.FORBIDDEN,
+        ),
+         courseViewerPage.goto(id),
+      ]);
+
+      expect(response.status()).toBe(HTTP_STATUS.FORBIDDEN);
+      await expect(welcomePage.header).toHaveText('Start Learning Today');
+      await expect(page).toHaveURL(
+        'http://localhost:3000/learning/welcome.html',
+      );
+    },
+  );
 });

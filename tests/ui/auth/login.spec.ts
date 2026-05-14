@@ -3,6 +3,7 @@ import {
   testUserInvalidPasswordUI,
   testUserInvalidUsernameUI,
   testUserLearningUI,
+  testUserLearningUIWithName,
 } from '@_src/test-data/user.data';
 
 test.describe('Tests for login', () => {
@@ -46,12 +47,16 @@ test.describe('Tests for login', () => {
     await expect(dashboardPage.myCourses).toHaveClass(/disabled-link/);
   });
 
-  test('should keep session after refresh @logged @smoke', async ({
-    dashboardPage,
-  }) => {
-    await dashboardPage.goto();
-    await dashboardPage.reload();
+  test(
+    'user can see his username in dashboard page ',
+    { tag: ['@logged', '@smoke'] },
+    async ({ dashboardPage }) => {
+      await dashboardPage.goto();
+      await dashboardPage.reload();
 
-    await expect(dashboardPage.dashboardUsername).toBeVisible();
-  });
+      await expect(dashboardPage.dashboardUsername).toHaveText(
+        testUserLearningUIWithName.displayName,
+      );
+    },
+  );
 });

@@ -1,5 +1,8 @@
 import { USER_NAME, USER_PASSWORD } from '@_config/env.config';
-import { LoginUserModel } from '@_src/models/user.model';
+import {
+  LoginUserModel,
+  LoginUserModelWithName,
+} from '@_src/models/user.model';
 
 export const testUserApi: LoginUserModel = {
   username: USER_NAME,
@@ -14,6 +17,12 @@ export const testUserIncorrectApi: LoginUserModel = {
 export const testUserLearningUI: LoginUserModel = {
   username: USER_NAME,
   password: USER_PASSWORD,
+};
+
+export const testUserLearningUIWithName: LoginUserModelWithName = {
+  username: USER_NAME,
+  password: USER_PASSWORD,
+  displayName: 'Emily Zhang',
 };
 
 export const testUserInvalidPasswordUI: LoginUserModel = {
